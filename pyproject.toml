@@ -1,0 +1,33 @@
+[project]
+name = "sapphire-sentinel"
+version = "0.1.0"
+description = "Policy, privacy, and payment safety for autonomous RWA agents on Robinhood Chain testnet."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "flask>=3.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.4",
+]
+deploy = [
+    "py-solc-x>=2.0",
+    "web3>=6.0",
+    "eth-account>=0.10",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+

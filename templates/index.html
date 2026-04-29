@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sapphire Sentinel</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0c1117;
+      color: #e5edf5;
+    }
+    body { margin: 0; min-height: 100vh; background: #0c1117; }
+    main { max-width: 1180px; margin: 0 auto; padding: 28px 18px 42px; }
+    header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+    h1 { margin: 0 0 6px; font-size: 28px; letter-spacing: 0; }
+    p { color: #93a4b7; line-height: 1.5; margin: 0; }
+    .badge { border: 1px solid rgba(45,212,191,.35); color: #5eead4; padding: 8px 10px; border-radius: 7px; font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; white-space: nowrap; }
+    .grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 14px; align-items: start; }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+    section { border: 1px solid #223042; background: #111923; border-radius: 8px; padding: 16px; margin-bottom: 14px; }
+    .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
+    @media (max-width: 720px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    .kpi { border: 1px solid #24364a; border-radius: 8px; padding: 12px; background: rgba(255,255,255,.02); min-height: 66px; }
+    .label { color: #7890a8; font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; text-transform: uppercase; margin-bottom: 8px; }
+    .value { font: 15px ui-monospace, SFMono-Regular, Menlo, monospace; overflow-wrap: anywhere; }
+    button { min-height: 36px; border: 1px solid #2dd4bf66; background: #0f2b2c; color: #5eead4; border-radius: 7px; cursor: pointer; font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; }
+    button.secondary { border-color: #344760; background: #111923; color: #b8c7d7; }
+    button.active { border-color: #2dd4bf99; background: #123638; color: #5eead4; }
+    .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+    .decision { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid #223042; padding-bottom: 12px; margin-bottom: 12px; }
+    .state { font-size: 22px; font-weight: 800; }
+    .approved { color: #22c55e; }
+    .blocked { color: #ef4444; }
+    .hash { color: #7890a8; text-align: right; font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; overflow-wrap: anywhere; }
+    ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 7px; }
+    li { border: 1px solid #24364a; border-radius: 7px; padding: 9px 10px; color: #b8c7d7; font-size: 13px; }
+    .rows { display: grid; border: 1px solid #24364a; border-radius: 8px; overflow: hidden; }
+    .row { display: grid; grid-template-columns: 145px minmax(0, 1fr); gap: 10px; padding: 9px 10px; border-bottom: 1px solid #223042; }
+    .row:last-child { border-bottom: 0; }
+    .row span:first-child { color: #7890a8; font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; text-transform: uppercase; }
+    .row span:last-child { color: #b8c7d7; font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; overflow-wrap: anywhere; }
+    input { width: 100%; box-sizing: border-box; min-height: 36px; border: 1px solid #24364a; border-radius: 7px; background: #0c1117; color: #e5edf5; padding: 0 10px; }
+    .form { display: grid; grid-template-columns: 1fr 110px; gap: 8px; margin-bottom: 10px; }
+    pre { border: 1px solid #24364a; border-radius: 8px; background: #0c1117; color: #b8c7d7; padding: 12px; overflow-x: auto; font-size: 12px; min-height: 120px; }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <h1>Sapphire Sentinel</h1>
+      <p>Policy, privacy, and payment safety for autonomous RWA agents on Robinhood Chain testnet.</p>
+    </div>
+    <div class="badge">testnet paper-only</div>
+  </header>
+
+  <div class="kpis">
+    <div class="kpi"><div class="label">Primary Chain</div><div class="value" id="chain">...</div></div>
+    <div class="kpi"><div class="label">Payment Rail</div><div class="value" id="payment">...</div></div>
+    <div class="kpi"><div class="label">Budget</div><div class="value" id="budget">...</div></div>
+    <div class="kpi"><div class="label">Mode</div><div class="value" id="mode">...</div></div>
+  </div>
+
+  <div class="grid">
+    <div>
+      <section>
+        <div class="label">Agent Payment Decision</div>
+        <div class="tabs">
+          <button id="approved-tab" class="active" onclick="showFlow('approved')">approved flow</button>
+          <button id="blocked-tab" class="secondary" onclick="showFlow('blocked')">blocked flow</button>
+        </div>
+        <div class="decision">
+          <div id="state" class="state">...</div>
+          <div id="receipt" class="hash"></div>
+        </div>
+        <ul id="reasons"></ul>
+      </section>
+
+      <section>
+        <div class="label">x402 Requirement</div>
+        <div class="rows">
+          <div class="row"><span>resource</span><span id="resource"></span></div>
+          <div class="row"><span>network</span><span id="network"></span></div>
+          <div class="row"><span>asset</span><span id="asset"></span></div>
+          <div class="row"><span>amount</span><span id="amount"></span></div>
+          <div class="row"><span>pay to</span><span id="payto"></span></div>
+        </div>
+      </section>
+
+      <section>
+        <div class="label">Robinhood Chain Anchor Preview</div>
+        <div class="rows">
+          <div class="row"><span>contract</span><span id="contract"></span></div>
+          <div class="row"><span>policy hash</span><span id="policy"></span></div>
+          <div class="row"><span>result hash</span><span id="result"></span></div>
+          <div class="row"><span>risk hash</span><span id="risk"></span></div>
+          <div class="row"><span>broadcast</span><span id="broadcast"></span></div>
+        </div>
+      </section>
+    </div>
+
+    <div>
+      <section>
+        <div class="label">Evaluate Resource</div>
+        <div class="form">
+          <input id="eval-resource" value="https://signals.sapphire.local/api/private-rwa-signal?basket=RH-STOCKS">
+          <button onclick="evaluateResource()">evaluate</button>
+        </div>
+        <pre id="eval-output">{}</pre>
+      </section>
+      <section>
+        <div class="label">Order Draft</div>
+        <pre id="order-draft">{}</pre>
+      </section>
+    </div>
+  </div>
+</main>
+<script>
+let data = null;
+let active = 'approved';
+function flow() { return active === 'approved' ? data.approved_flow : data.blocked_flow; }
+function shortHash(v) { return v ? v.slice(0, 10) + '...' + v.slice(-8) : ''; }
+function amount(v) { return (Number(v || 0) / 1000000).toFixed(6) + ' USDC'; }
+function showFlow(name) {
+  active = name;
+  document.getElementById('approved-tab').className = name === 'approved' ? 'active' : 'secondary';
+  document.getElementById('blocked-tab').className = name === 'blocked' ? 'active' : 'secondary';
+  renderFlow();
+}
+function renderFlow() {
+  const f = flow();
+  const state = document.getElementById('state');
+  state.textContent = f.approved ? 'APPROVED' : 'BLOCKED';
+  state.className = 'state ' + (f.approved ? 'approved' : 'blocked');
+  document.getElementById('receipt').textContent = shortHash(f.receipt_id);
+  document.getElementById('reasons').innerHTML = f.reasons.map(r => `<li>${r}</li>`).join('');
+  const req = f.payment_requirements;
+  document.getElementById('resource').textContent = req.resource;
+  document.getElementById('network').textContent = req.network;
+  document.getElementById('asset').textContent = req.asset;
+  document.getElementById('amount').textContent = amount(req.maxAmountRequired);
+  document.getElementById('payto').textContent = req.payTo;
+  const a = f.chain_anchor;
+  document.getElementById('contract').textContent = `${a.contract} / chain ${a.chain_id}`;
+  document.getElementById('policy').textContent = a.mandate_policy_hash;
+  document.getElementById('result').textContent = a.result_hash;
+  document.getElementById('risk').textContent = a.risk_hash;
+  document.getElementById('broadcast').textContent = `${a.broadcast} (${a.mode})`;
+  document.getElementById('order-draft').textContent = JSON.stringify(f.order_draft.primary_draft, null, 2);
+}
+async function evaluateResource() {
+  const response = await fetch('/api/evaluate', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      resource: document.getElementById('eval-resource').value,
+      amount_usdc: '0.012',
+      action: 'buy-private-signal',
+      payload_summary: 'agent requests private RWA basket signal',
+      result_summary: 'private basket risk passes issuer concentration and drawdown caps'
+    })
+  });
+  const body = await response.json();
+  document.getElementById('eval-output').textContent = JSON.stringify({
+    approved: body.decision.approved,
+    risk_flags: body.decision.risk_flags,
+    receipt_id: body.decision.receipt_id,
+    mode: body.mode
+  }, null, 2);
+}
+async function load() {
+  const response = await fetch('/api/demo');
+  data = await response.json();
+  document.getElementById('chain').textContent = `${data.project.primary_chain} ${data.project.chain_id}`;
+  document.getElementById('payment').textContent = data.project.settlement_network;
+  document.getElementById('budget').textContent = `$${data.mandate.remaining_usdc} / $${data.mandate.max_spend_usdc}`;
+  document.getElementById('mode').textContent = data.project.mode;
+  renderFlow();
+  evaluateResource();
+}
+load();
+</script>
+</body>
+</html>
+
