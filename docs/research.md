@@ -65,9 +65,11 @@ resource. The current v2 header shape uses `PAYMENT-REQUIRED`,
 
 Sentinel should be shown as a buyer-side policy wrapper around this flow:
 
-- Decode and bind the quote.
-- Check provider host/path, network, amount, `payTo`, facilitator, expiry, and
-  replay nonce.
+- Decode the quote and bind it to the policy decision.
+- In this demo, check provider domain, action, amount, `payTo`, chain metadata,
+  content-risk signals, and contract-level receipt replay protection.
+- In a production facilitator wrapper, extend the same policy to full host/path,
+  facilitator, expiry, and settlement verification.
 - Redact payment metadata before forwarding to a facilitator.
 - Emit a human-readable audit trail.
 

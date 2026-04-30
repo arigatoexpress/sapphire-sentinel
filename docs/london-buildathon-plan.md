@@ -6,7 +6,8 @@ Sapphire Sentinel is the agent firewall for tokenized RWA finance on Robinhood
 Chain testnet. Agents can buy paid intelligence through x402-style HTTP 402
 flows, but every call is checked against a human mandate, budget, domain
 allow-list, quote-binding policy, prompt-injection screen, secret-egress screen,
-privacy commitment, and replay nonce before a receipt hash is anchored on-chain.
+privacy commitment, and contract-level receipt replay protection before a
+receipt hash is anchored on-chain.
 
 ## Why This Should Win
 
@@ -32,8 +33,8 @@ privacy commitment, and replay nonce before a receipt hash is anchored on-chain.
    using CAIP-2 network ID `eip155:84532`.
 4. Sentinel screens the request. A safe request is approved; an untrusted or
    prompt-injected request is blocked.
-5. Approved flow returns a dry-run Robinhood order draft and an on-chain anchor
-   preview for `SapphireSentinelRegistry.recordPaymentEvaluation(...)`.
+5. Approved flow returns a dry-run Robinhood order draft and a recorded
+   Robinhood Chain receipt for `SapphireSentinelRegistry.recordPaymentEvaluation(...)`.
 6. Dashboard shows the same decision as a judge-friendly chain/payment/privacy
    trace in the standalone app.
 
@@ -52,7 +53,7 @@ privacy commitment, and replay nonce before a receipt hash is anchored on-chain.
 ## Safe Defaults
 
 - `execution_enabled=false` in every order draft.
-- `broadcast=false` in the chain anchor preview unless a judge/operator
+- Custom resource evaluations stay preview-only unless a judge/operator
   intentionally records a receipt transaction.
 - x402 settlement is simulated on Base Sepolia because public facilitator
   support is mature there; Robinhood Chain receives the receipt anchor.
@@ -69,8 +70,7 @@ privacy commitment, and replay nonce before a receipt hash is anchored on-chain.
 
 ## Next Buildathon Steps
 
-1. Replace the dry-run anchor preview with a `recordPaymentEvaluation(...)`
-   transaction in testnet mode only.
+1. Record and upload the 90-second video.
 2. Add a focused Oasis Sapphire sidecar contract for confidential policy
    evaluation.
 3. Add a small Zama/FHEVM local mock that produces the `resultHash` and

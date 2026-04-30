@@ -2,7 +2,7 @@
 
 ## 0-10 Seconds
 
-Open the dashboard.
+Open the dashboard to the Red-Team Matrix and verdict panel.
 
 Pitch:
 
@@ -12,7 +12,7 @@ Pitch:
 
 ## 10-30 Seconds
 
-Show the approved scenario.
+Show the approved scenario, x402 Payment Quote, and Robinhood Chain Anchor.
 
 Point out:
 
@@ -22,7 +22,7 @@ Point out:
 
 ## 30-50 Seconds
 
-Click the prompt-injection or untrusted-domain scenario.
+Click the prompt-injection or untrusted-domain scenario in the Red-Team Matrix.
 
 Point out:
 
@@ -32,7 +32,7 @@ Point out:
 
 ## 50-70 Seconds
 
-Show the privacy sidecars.
+Show Privacy Sidecars and On-Chain Event Proofs.
 
 Pitch:
 
@@ -42,7 +42,7 @@ Pitch:
 
 ## 70-90 Seconds
 
-Show the judge scorecard and contract anchor.
+Show the Judge Scorecard and Proof Points.
 
 Close:
 

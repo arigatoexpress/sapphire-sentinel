@@ -4,7 +4,7 @@ The agent firewall for tokenized RWA finance on Robinhood Chain testnet.
 
 Sapphire Sentinel is a London buildathon project for the Robinhood Chain / Arbitrum Open House ecosystem. It gives AI agents a bounded mandate before they can buy paid intelligence, touch tokenized-stock workflows, or draft market actions.
 
-The short version: agents can hit paid APIs through an x402-style flow, but Sentinel checks domain allow-lists, spend limits, quote binding, prompt-injection language, secret-egress risk, replay nonces, and privacy commitments first. Safe decisions produce hashed receipts for Robinhood Chain testnet. Unsafe decisions are blocked before any wallet signature or order submission.
+The short version: agents can hit paid APIs through an x402-style flow, but Sentinel checks domain allow-lists, spend limits, quote binding, prompt-injection language, secret-egress risk, contract-level receipt replay protection, and privacy commitments first. Safe decisions produce hashed receipts for Robinhood Chain testnet. Unsafe decisions are blocked before any wallet signature or order submission.
 
 ## What Is In This Repo
 
@@ -43,6 +43,20 @@ flask --app sapphire_sentinel.app run --port 8098
 
 Open `http://127.0.0.1:8098`.
 
+## Judge Quickstart
+
+```bash
+pip install -e ".[dev]"
+pytest -q
+flask --app sapphire_sentinel.app run --port 8098
+```
+
+Backup CLI:
+
+```bash
+PYTHONPATH=src python scripts/run_demo.py
+```
+
 ## Verify
 
 ```bash
@@ -71,7 +85,7 @@ python scripts/deploy_robinhood_chain.py --dry-run
 4. Sentinel approves the safe request and blocks a prompt-injected request.
 5. A privacy commitment is produced from the Oasis Sapphire sidecar path, with Zama and Aztec companion artifacts clearly labeled.
 6. A dry-run Robinhood Chain stock-token order draft is shown.
-7. A hash-only receipt preview is ready for `SapphireSentinelRegistry.recordPaymentEvaluation(...)`.
+7. Approved and blocked receipt hashes are anchored on Robinhood Chain testnet with explorer links.
 
 ## Robinhood Chain Testnet
 
@@ -95,3 +109,11 @@ The demo uses Robinhood Chain for on-chain attestations and receipt anchors. x40
 - Source verification: complete, compiler `v0.8.20+commit.a1b79de6`, optimization disabled.
 
 The deployment used a burner EVM account funded only with Robinhood Chain testnet ETH.
+
+## Anchored Demo Events
+
+- Mandate registration: `0x4b00516f25ee38b1b59a0acd0f442706ae2b0756d9d56a25c0cf18d5eabc01dc`
+- Prior spend seed: `0xbe28bc9af7a9ec6c8c1e671b9b1a17788b217942c102eec4ab7c808f418ec67a`
+- Approved receipt: `0xc522c1d31f632662e8a7921a50e0b8827eabc7f5ffd88e3ca489a4e4399d25d8`
+- Blocked receipt: `0x0d7d1708b80cc14975564dd96c64d7ed37a5ee7dc5ac484929d5ae4bca7c7390`
+- On-chain remaining demo budget: `1.618` USDC (`1,618,000` atomic units).

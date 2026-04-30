@@ -11,7 +11,35 @@
         "tx_explorer": "https://explorer.testnet.chain.robinhood.com/tx/0xc53ab8fc8cdab4ce7ef5f09fd56fc564756fd8d5e5b7c0396238878d6cc84975",
         "source_verified": true,
         "compiler_version": "v0.8.20+commit.a1b79de6",
-        "optimization_used": false
+        "optimization_used": false,
+        "demo_events": {
+          "mandate_id": "sentinel-london-demo-v1",
+          "mandate_hash": "0xbf6ecfa739d5589e81349d87852e5f5beaa629c5a40dfdc6fa7cbf59276eb3f1",
+          "controller": "0xa11ce00000000000000000000000000000004026",
+          "agent": "0xa6e1700000000000000000000000000000000402",
+          "register_mandate": {
+            "tx_hash": "0x4b00516f25ee38b1b59a0acd0f442706ae2b0756d9d56a25c0cf18d5eabc01dc",
+            "explorer": "https://explorer.testnet.chain.robinhood.com/tx/0x4b00516f25ee38b1b59a0acd0f442706ae2b0756d9d56a25c0cf18d5eabc01dc"
+          },
+          "seed_prior_spend": {
+            "tx_hash": "0xbe28bc9af7a9ec6c8c1e671b9b1a17788b217942c102eec4ab7c808f418ec67a",
+            "explorer": "https://explorer.testnet.chain.robinhood.com/tx/0xbe28bc9af7a9ec6c8c1e671b9b1a17788b217942c102eec4ab7c808f418ec67a",
+            "receipt_id": "0x4cd7cd593b49453f2b1a113b33c9c51152e1e0e8faaa42f2da05036b50508c19"
+          },
+          "approved_receipt": {
+            "tx_hash": "0xc522c1d31f632662e8a7921a50e0b8827eabc7f5ffd88e3ca489a4e4399d25d8",
+            "explorer": "https://explorer.testnet.chain.robinhood.com/tx/0xc522c1d31f632662e8a7921a50e0b8827eabc7f5ffd88e3ca489a4e4399d25d8",
+            "receipt_id": "0x7150919013712c3a3122718f735814164f32e0835b815d0c5bf1d88dc8eea045"
+          },
+          "blocked_receipt": {
+            "tx_hash": "0x0d7d1708b80cc14975564dd96c64d7ed37a5ee7dc5ac484929d5ae4bca7c7390",
+            "explorer": "https://explorer.testnet.chain.robinhood.com/tx/0x0d7d1708b80cc14975564dd96c64d7ed37a5ee7dc5ac484929d5ae4bca7c7390",
+            "receipt_id": "0x89a4b9b6e5ce55c17984d2e90d631d4514ea3176f062f61828cc1a5c74b815d7"
+          },
+          "updated_at": 1777509972,
+          "remaining_spend_atomic": 1618000,
+          "remaining_spend_usdc": "1.618"
+        }
       }
     }
   }
