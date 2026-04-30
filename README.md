@@ -94,9 +94,12 @@ ruff check .
 python3 scripts/deploy_robinhood_chain.py --dry-run
 python3 scripts/probe_networks.py
 python3 scripts/deploy_registry.py --network megaeth_testnet --dry-run
+python3 scripts/deploy_registry.py --network megaeth_testnet --check --key-alias robinhood_testnet
 ```
 
 `--dry-run` compiles the contract and skips deployment. Full deployment requires a funded Robinhood Chain testnet key in `ROBINHOOD_DEPLOY_KEY`.
+For MegaETH, `--key-alias robinhood_testnet` reuses the same local burner key
+only when that burner address has MegaETH testnet gas.
 
 ## API Surface
 

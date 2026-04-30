@@ -87,7 +87,8 @@ MegaETH testnet chain ID is `6343`, with public RPC
 Next code:
 
 - Use `scripts/deploy_registry.py --network megaeth_testnet --dry-run`.
-- Run `--check` only after the burner has MegaETH testnet ETH.
+- Run `--check --key-alias robinhood_testnet` only after the shared burner
+  address has MegaETH testnet ETH.
 - Deploy only if the RPC preflight passes and the testnet key has enough gas.
 - Record the MegaETH address under `data/deployments.json` without overwriting
   Robinhood Chain metadata.
@@ -95,7 +96,7 @@ Next code:
 Latest preflight note: the public MegaETH RPC reported chain ID `6343`, but the
 current local burner has zero MegaETH testnet ETH. Fund the burner address from
 the MegaETH faucet, then rerun `scripts/deploy_registry.py --network
-megaeth_testnet --check`.
+megaeth_testnet --check --key-alias robinhood_testnet`.
 
 ### 3. Zama Encrypted Risk Gate
 

@@ -12,6 +12,9 @@ Keys are looked up without printing them:
   3. $ROBINHOOD_DEPLOY_KEY for robinhood_testnet compatibility
   4. ~/.config/sapphire-secrets/<network_id>_deploy_key
   5. ~/.config/sapphire-secrets/robinhood_deploy_key for robinhood_testnet
+
+Use --key-alias robinhood_testnet when the same testnet burner address has
+been funded on another EVM testnet, such as MegaETH.
 """
 
 from __future__ import annotations
@@ -43,13 +46,18 @@ def main() -> int:
     deployable = sorted(n.id for n in NETWORKS if n.chain_id and n.rpc)
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--network", default="robinhood_testnet", choices=deployable)
+    parser.add_argument(
+        "--key-alias",
+        choices=deployable,
+        help="Use a different configured testnet key without copying secrets.",
+    )
     parser.add_argument("--check", action="store_true", help="Read-only RPC/key/balance preflight")
     parser.add_argument("--dry-run", action="store_true", help="Compile only; do not deploy")
     args = parser.parse_args()
 
     network = network_by_id(args.network)
     if args.check:
-        return preflight(network)
+        return preflight(network, key_alias=args.key_alias)
 
     compiled = compile_contract()
     log.info("compiled %s with %d ABI entries", CONTRACT_NAME, len(compiled["abi"]))
@@ -60,7 +68,7 @@ def main() -> int:
             len(compiled["bytecode"]) // 2,
         )
         return 0
-    address = deploy(network, compiled)
+    address = deploy(network, compiled, key_alias=args.key_alias)
     log.info("deployed %s to %s on %s", CONTRACT_NAME, address, network.name)
     return 0
 
@@ -86,7 +94,7 @@ def compile_contract() -> dict[str, Any]:
     return {"abi": result[key]["abi"], "bytecode": result[key]["bin"]}
 
 
-def preflight(network: NetworkProfile) -> int:
+def preflight(network: NetworkProfile, *, key_alias: str | None = None) -> int:
     try:
         from eth_account import Account  # type: ignore[import]
         from web3 import Web3  # type: ignore[import]
@@ -109,7 +117,7 @@ def preflight(network: NetworkProfile) -> int:
     log.info("[ OK ] RPC %s chain_id=%s block=%s", network.rpc, chain_id, w3.eth.block_number)
 
     try:
-        account = Account.from_key(load_private_key(network.id))
+        account = Account.from_key(load_private_key(network.id, key_alias=key_alias))
     except Exception as exc:
         log.error("[FAIL] deploy key unavailable or invalid: %s", exc)
         return 1
@@ -126,7 +134,7 @@ def preflight(network: NetworkProfile) -> int:
     return 0
 
 
-def deploy(network: NetworkProfile, compiled: dict[str, Any]) -> str:
+def deploy(network: NetworkProfile, compiled: dict[str, Any], *, key_alias: str | None = None) -> str:
     from eth_account import Account  # type: ignore[import]
     from web3 import Web3  # type: ignore[import]
 
@@ -137,7 +145,7 @@ def deploy(network: NetworkProfile, compiled: dict[str, Any]) -> str:
     if w3.eth.chain_id != network.chain_id:
         raise RuntimeError(f"unexpected chain id: {w3.eth.chain_id}")
 
-    account = Account.from_key(load_private_key(network.id))
+    account = Account.from_key(load_private_key(network.id, key_alias=key_alias))
     contract = w3.eth.contract(abi=compiled["abi"], bytecode=compiled["bytecode"])
     tx = contract.constructor().build_transaction(
         {
@@ -162,24 +170,26 @@ def deploy(network: NetworkProfile, compiled: dict[str, Any]) -> str:
     return address
 
 
-def load_private_key(network_id: str) -> str:
-    env_names = ["SENTINEL_DEPLOY_KEY", f"{network_id.upper()}_DEPLOY_KEY"]
-    if network_id == "robinhood_testnet":
+def load_private_key(network_id: str, *, key_alias: str | None = None) -> str:
+    key_id = key_alias or network_id
+    env_names = ["SENTINEL_DEPLOY_KEY", f"{key_id.upper()}_DEPLOY_KEY"]
+    if key_id == "robinhood_testnet":
         env_names.append("ROBINHOOD_DEPLOY_KEY")
     for name in env_names:
         key = os.environ.get(name, "").strip()
         if key:
             return key
 
-    candidates = [Path.home() / ".config" / "sapphire-secrets" / f"{network_id}_deploy_key"]
-    if network_id == "robinhood_testnet":
+    candidates = [Path.home() / ".config" / "sapphire-secrets" / f"{key_id}_deploy_key"]
+    if key_id == "robinhood_testnet":
         candidates.append(Path.home() / ".config" / "sapphire-secrets" / "robinhood_deploy_key")
     for path in candidates:
         if path.exists():
             key = path.read_text(encoding="utf-8").strip()
             if key:
                 return key
-    raise RuntimeError(f"No deploy key found for {network_id}.")
+    alias_suffix = f" via alias {key_alias}" if key_alias else ""
+    raise RuntimeError(f"No deploy key found for {network_id}{alias_suffix}.")
 
 
 def write_deployment(network: NetworkProfile, address: str, tx_hash: str) -> None:
