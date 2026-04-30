@@ -209,6 +209,7 @@
         <h2>Robinhood Chain Anchor</h2>
         <div class="rows">
           <div class="row"><span>deployed</span><span id="deployed"></span></div>
+          <div class="row"><span>verified</span><span id="verified"></span></div>
           <div class="row"><span>policy</span><span id="policy"></span></div>
           <div class="row"><span>result</span><span id="result"></span></div>
           <div class="row"><span>risk</span><span id="risk"></span></div>
@@ -297,6 +298,7 @@ function renderDecision(decision) {
 
   const anchor = decision.chain_anchor;
   text('deployed', anchor.contract_address ? `${anchor.contract_address} (${anchor.tx_hash})` : 'pending deployment');
+  text('verified', anchor.source_verified ? `true (${anchor.compiler_version})` : 'pending source verification');
   text('policy', anchor.mandate_policy_hash);
   text('result', anchor.result_hash);
   text('risk', anchor.risk_hash);

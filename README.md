@@ -92,5 +92,6 @@ The demo uses Robinhood Chain for on-chain attestations and receipt anchors. x40
 - Address: `0x2EBB91F7B376cB821d90ac4A7d77B0d06b70B36F`
 - Transaction: `0xc53ab8fc8cdab4ce7ef5f09fd56fc564756fd8d5e5b7c0396238878d6cc84975`
 - Explorer: `https://explorer.testnet.chain.robinhood.com/address/0x2EBB91F7B376cB821d90ac4A7d77B0d06b70B36F`
+- Source verification: complete, compiler `v0.8.20+commit.a1b79de6`, optimization disabled.
 
 The deployment used a burner EVM account funded only with Robinhood Chain testnet ETH.

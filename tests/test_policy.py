@@ -52,8 +52,10 @@ def test_demo_state_is_safe_by_default():
 
     assert state["project"]["mode"] == "testnet_paper_only"
     assert state["chain_config"]["deployment"]["address"].startswith("0x")
+    assert state["chain_config"]["deployment"]["source_verified"] is True
     assert state["approved_flow"]["approved"] is True
     assert state["approved_flow"]["chain_anchor"]["contract_address"].startswith("0x")
+    assert state["approved_flow"]["chain_anchor"]["source_verified"] is True
     assert state["blocked_flow"]["approved"] is False
     assert len(state["attack_scenarios"]) >= 5
     assert len(state["privacy_attestations"]) == 3

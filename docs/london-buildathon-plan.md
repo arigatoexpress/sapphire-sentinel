@@ -65,15 +65,15 @@ privacy commitment, and replay nonce before a receipt hash is anchored on-chain.
 - Address: `0x2EBB91F7B376cB821d90ac4A7d77B0d06b70B36F`
 - Transaction: `0xc53ab8fc8cdab4ce7ef5f09fd56fc564756fd8d5e5b7c0396238878d6cc84975`
 - Explorer: `https://explorer.testnet.chain.robinhood.com/address/0x2EBB91F7B376cB821d90ac4A7d77B0d06b70B36F`
+- Source verification: complete on Blockscout with compiler `v0.8.20+commit.a1b79de6`.
 
 ## Next Buildathon Steps
 
-1. Verify the contract source on the Robinhood Chain Blockscout explorer.
-2. Replace the dry-run anchor preview with a `recordPaymentEvaluation(...)`
+1. Replace the dry-run anchor preview with a `recordPaymentEvaluation(...)`
    transaction in testnet mode only.
-3. Add a focused Oasis Sapphire sidecar contract for confidential policy
+2. Add a focused Oasis Sapphire sidecar contract for confidential policy
    evaluation.
-4. Add a small Zama/FHEVM local mock that produces the `resultHash` and
+3. Add a small Zama/FHEVM local mock that produces the `resultHash` and
    `riskHash` from hidden basket weights.
-5. Record a 90-second demo: approved payment, blocked injection attempt,
+4. Record a 90-second demo: approved payment, blocked injection attempt,
    Robinhood Chain explorer receipt, and non-submitting RWA order draft.

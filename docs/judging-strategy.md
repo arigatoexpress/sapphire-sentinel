@@ -38,6 +38,7 @@ testnet, and addresses a real operational gap in tokenized finance.
 - Public GitHub repo.
 - README with safety defaults.
 - Contract compiles.
+- Contract deployed and source-verified on Robinhood Chain testnet.
 - Local tests pass.
 - Dashboard live locally.
 - 90-second video recorded.

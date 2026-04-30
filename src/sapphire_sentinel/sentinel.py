@@ -324,6 +324,8 @@ def evaluate_attempt(
             "explorer": deployment.get("explorer") or ROBINHOOD_EXPLORER,
             "tx_hash": deployment.get("tx_hash"),
             "tx_explorer": deployment.get("tx_explorer"),
+            "source_verified": bool(deployment.get("source_verified")),
+            "compiler_version": deployment.get("compiler_version"),
             "mandate_id": active_mandate.mandate_id,
             "mandate_policy_hash": policy_hash,
             "receipt_id": receipt_id,
@@ -498,8 +500,8 @@ def build_judging_scorecard() -> list[dict[str, str]]:
         {
             "criterion": "Smart contract quality",
             "evidence": (
-                "Non-custodial mandate registry with budget accounting, expiry, nonce replay "
-                "defense, two-step operator transfer, and static tests."
+                "Source-verified Robinhood Chain testnet registry with budget accounting, "
+                "expiry, nonce replay defense, two-step operator transfer, and static tests."
             ),
         },
         {
