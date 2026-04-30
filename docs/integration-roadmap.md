@@ -52,16 +52,18 @@ Do not say:
 The current demo emits an x402-compatible `402 Payment Required` response with
 Base Sepolia CAIP-2 `eip155:84532` and Base Sepolia USDC
 `0x036CbD53842c5426634e7929541eC2318f3dCF7e`. It also ships a protected
-resource at `/api/x402/sentinel-report` that accepts a mock
-`PAYMENT-SIGNATURE`, verifies quote binding, rejects amount/payee tampering, and
-blocks nonce replay.
+resource at `/api/x402/sentinel-report` that accepts a mock or wallet-signed
+`PAYMENT-SIGNATURE`, verifies quote binding, recovers EIP-712 payers when
+present, rejects amount/payee tampering, and blocks nonce replay.
 
 Demo commands:
 
 ```bash
-HEADER=$(PYTHONPATH=src python scripts/mint_mock_x402_payment.py --header-only)
+HEADER=$(PYTHONPATH=src python3 scripts/mint_mock_x402_payment.py --header-only)
 curl -H "PAYMENT-SIGNATURE: $HEADER" http://127.0.0.1:8098/api/x402/sentinel-report
 curl -H "PAYMENT-SIGNATURE: $HEADER" http://127.0.0.1:8098/api/x402/sentinel-report
+SIGNED=$(python3 scripts/sign_x402_payment.py --header-only)
+curl -H "PAYMENT-SIGNATURE: $SIGNED" http://127.0.0.1:8098/api/x402/sentinel-report
 ```
 
 The first call returns `mode=x402_mock_verified`; the second returns a 402 replay
@@ -70,8 +72,8 @@ settlement.
 
 Next code:
 
-- Replace the mock header generator with a wallet-signed Base Sepolia x402
-  payload.
+- Replace the local EIP-712 verifier with a facilitator-backed Base Sepolia
+  x402 verification path.
 - Add an env-gated verifier path for `https://x402.org/facilitator`.
 - Keep `liveSettlementEnabled=false` until a testnet wallet signs the payload.
 - Optionally add CDP facilitator config behind env vars for Base mainnet.

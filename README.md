@@ -18,6 +18,7 @@ The short version: agents can hit paid APIs through an x402-style flow, but Sent
 | Red-team scenarios | `src/sapphire_sentinel/scenarios.py` |
 | Flask demo app | `src/sapphire_sentinel/app.py` |
 | Mock x402 buyer header | `scripts/mint_mock_x402_payment.py` |
+| Signed x402 buyer header | `scripts/sign_x402_payment.py` |
 | Privacy artifact generator | `scripts/generate_privacy_proofs.py` |
 | Robinhood Chain deploy helper | `scripts/deploy_robinhood_chain.py` |
 | Buildathon plan | `docs/london-buildathon-plan.md` |
@@ -58,14 +59,14 @@ flask --app sapphire_sentinel.app run --port 8098
 Backup CLI:
 
 ```bash
-PYTHONPATH=src python scripts/run_demo.py
-python scripts/generate_privacy_proofs.py
+PYTHONPATH=src python3 scripts/run_demo.py
+python3 scripts/generate_privacy_proofs.py
 ```
 
 Protected x402 report demo:
 
 ```bash
-HEADER=$(PYTHONPATH=src python scripts/mint_mock_x402_payment.py --header-only)
+HEADER=$(PYTHONPATH=src python3 scripts/mint_mock_x402_payment.py --header-only)
 curl -H "PAYMENT-SIGNATURE: $HEADER" http://127.0.0.1:8098/api/x402/sentinel-report
 curl -H "PAYMENT-SIGNATURE: $HEADER" http://127.0.0.1:8098/api/x402/sentinel-report
 ```
@@ -74,14 +75,25 @@ The first call returns the private-signal report in `x402_mock_verified` mode.
 The second call is rejected for nonce replay. No facilitator or live settlement
 is invoked.
 
+Wallet-signed non-settling variant:
+
+```bash
+HEADER=$(python3 scripts/sign_x402_payment.py --header-only)
+curl -H "PAYMENT-SIGNATURE: $HEADER" http://127.0.0.1:8098/api/x402/sentinel-report
+```
+
+If `SENTINEL_X402_SIGNING_KEY` is not set, the script uses an ephemeral local
+key and prints only the header. The server verifies the EIP-712 payer signature
+before unlocking the report.
+
 ## Verify
 
 ```bash
 pytest -q
 ruff check .
-python scripts/deploy_robinhood_chain.py --dry-run
-python scripts/probe_networks.py
-python scripts/deploy_registry.py --network megaeth_testnet --dry-run
+python3 scripts/deploy_robinhood_chain.py --dry-run
+python3 scripts/probe_networks.py
+python3 scripts/deploy_registry.py --network megaeth_testnet --dry-run
 ```
 
 `--dry-run` compiles the contract and skips deployment. Full deployment requires a funded Robinhood Chain testnet key in `ROBINHOOD_DEPLOY_KEY`.
@@ -146,8 +158,8 @@ and the dashboard:
 
 - Robinhood Chain testnet: live RWA audit anchor.
 - Base Sepolia: local mock x402 gate with `PAYMENT-SIGNATURE` verification,
-  quote binding, and nonce replay rejection; next step is real wallet-signed
-  testnet settlement.
+  quote binding, EIP-712 payer recovery, and nonce replay rejection; next step
+  is real testnet facilitator settlement.
 - MegaETH testnet: deploy-ready low-latency receipt mirror.
 - Zama on Sepolia: local encrypted-risk proof bundle and mock contract, with
   real FHEVM deployment next.

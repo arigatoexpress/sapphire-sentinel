@@ -31,8 +31,9 @@ receipt hash is anchored on-chain.
 2. Agent requests a paid private RWA signal.
 3. The API returns an x402 v2-compatible payment requirement on Base Sepolia
    using CAIP-2 network ID `eip155:84532`.
-4. The protected report endpoint verifies a mock `PAYMENT-SIGNATURE`, rejects
-   replayed nonces, and keeps live facilitator settlement disabled.
+4. The protected report endpoint verifies mock or EIP-712 signed
+   `PAYMENT-SIGNATURE` headers, rejects replayed nonces, and keeps live
+   facilitator settlement disabled.
 5. Sentinel screens the request. A safe request is approved; an untrusted or
    prompt-injected request is blocked.
 6. Approved flow returns a dry-run Robinhood order draft and a recorded

@@ -63,6 +63,8 @@ class PaymentVerificationResult:
     network: str | None = None
     asset: str | None = None
     resource: str | None = None
+    signature_mode: str = "simulated"
+    signature_verified: bool = False
     live_settlement_enabled: bool = False
 
     def to_wire(self) -> dict[str, Any]:
@@ -76,6 +78,8 @@ class PaymentVerificationResult:
             "network": self.network,
             "asset": self.asset,
             "resource": self.resource,
+            "signatureMode": self.signature_mode,
+            "signatureVerified": self.signature_verified,
             "liveSettlementEnabled": self.live_settlement_enabled,
             "verifier": "sapphire_sentinel_mock_x402",
         }
@@ -148,6 +152,88 @@ def build_mock_payment_payload(
     }
 
 
+def build_eip3009_typed_data(
+    requirement: PaymentRequirements,
+    authorization: dict[str, Any],
+) -> dict[str, Any]:
+    """Build an EIP-712 envelope matching USDC-style transfer authorization."""
+
+    return {
+        "types": {
+            "EIP712Domain": [
+                {"name": "name", "type": "string"},
+                {"name": "version", "type": "string"},
+                {"name": "chainId", "type": "uint256"},
+                {"name": "verifyingContract", "type": "address"},
+            ],
+            "TransferWithAuthorization": [
+                {"name": "from", "type": "address"},
+                {"name": "to", "type": "address"},
+                {"name": "value", "type": "uint256"},
+                {"name": "validAfter", "type": "uint256"},
+                {"name": "validBefore", "type": "uint256"},
+                {"name": "nonce", "type": "bytes32"},
+            ],
+        },
+        "primaryType": "TransferWithAuthorization",
+        "domain": {
+            "name": "USD Coin",
+            "version": "2",
+            "chainId": _chain_id_from_caip2(requirement.network),
+            "verifyingContract": requirement.asset,
+        },
+        "message": {
+            "from": authorization["from"],
+            "to": authorization["to"],
+            "value": int(authorization["value"]),
+            "validAfter": int(authorization.get("validAfter", 0)),
+            "validBefore": int(authorization.get("validBefore", 0)),
+            "nonce": authorization["nonce"],
+        },
+    }
+
+
+def build_signed_payment_payload(
+    requirement: PaymentRequirements,
+    *,
+    private_key: str,
+    nonce: str,
+    valid_after: int = 0,
+    valid_before: int = 0,
+) -> dict[str, Any]:
+    """Return a locally wallet-signed, non-settling x402 payload."""
+
+    try:
+        from eth_account import Account  # type: ignore[import]
+        from eth_account.messages import encode_typed_data  # type: ignore[import]
+    except ImportError as exc:
+        raise RuntimeError("eth-account is required to sign x402 payment payloads") from exc
+
+    account = Account.from_key(private_key)
+    authorization = {
+        "from": account.address,
+        "to": requirement.pay_to,
+        "value": requirement.amount,
+        "validAfter": valid_after,
+        "validBefore": valid_before,
+        "nonce": nonce,
+    }
+    typed_data = build_eip3009_typed_data(requirement, authorization)
+    signable = encode_typed_data(full_message=typed_data)
+    signed = Account.sign_message(signable, private_key)
+    signature = signed.signature.hex()
+    if not signature.startswith("0x"):
+        signature = f"0x{signature}"
+
+    payload = build_mock_payment_payload(requirement, from_address=account.address, nonce=nonce)
+    payload["payload"]["signature"] = signature
+    payload["payload"]["authorization"] = authorization
+    payload["extensions"]["sentinel"]["mode"] = "wallet_signed_policy_preview"
+    payload["extensions"]["sentinel"]["signatureMode"] = "eip712-eip3009"
+    payload["extensions"]["sentinel"]["typedDataDomain"] = typed_data["domain"]
+    return payload
+
+
 def verify_mock_payment_header(
     header_value: str,
     requirement: PaymentRequirements,
@@ -188,8 +274,11 @@ def verify_mock_payment_header(
     payer = str(authorization.get("from") or "")
     pay_to = str(authorization.get("to") or authorization.get("payTo") or accepted.get("payTo") or "")
     nonce = str(authorization.get("nonce") or "")
+    signature = str(payment_payload.get("signature") or payload.get("signature") or "")
+    sentinel_extensions = _dict_at(_dict_at(payload, "extensions"), "sentinel")
+    signature_mode = str(sentinel_extensions.get("signatureMode") or "simulated")
 
-    if not _nonempty_hexish(payment_payload.get("signature") or payload.get("signature")):
+    if not _nonempty_hexish(signature):
         return PaymentVerificationResult(valid=False, error="missing simulated payment signature")
     if not _same_text(resource, requirement.resource):
         return PaymentVerificationResult(valid=False, error="resource does not match payment requirement")
@@ -208,6 +297,17 @@ def verify_mock_payment_header(
     if nonce_cache is not None and nonce in nonce_cache:
         return PaymentVerificationResult(valid=False, error="nonce has already been used")
 
+    signature_verified = False
+    if signature_mode == "eip712-eip3009":
+        recovered, signature_error = _recover_eip712_payer(requirement, authorization, signature)
+        if signature_error:
+            return PaymentVerificationResult(valid=False, error=signature_error)
+        if not _same_address(recovered, payer):
+            return PaymentVerificationResult(valid=False, error="signature does not match payer")
+        signature_verified = True
+    elif signature_mode != "simulated":
+        return PaymentVerificationResult(valid=False, error="unsupported signature mode")
+
     if nonce_cache is not None:
         nonce_cache.add(nonce)
     return PaymentVerificationResult(
@@ -220,6 +320,8 @@ def verify_mock_payment_header(
         network=network or requirement.network,
         asset=asset or requirement.asset,
         resource=resource,
+        signature_mode=signature_mode,
+        signature_verified=signature_verified,
         live_settlement_enabled=False,
     )
 
@@ -254,3 +356,29 @@ def _same_address(left: str, right: str) -> bool:
 
 def _nonempty_hexish(value: Any) -> bool:
     return isinstance(value, str) and value.startswith("0x") and len(value) > 2
+
+
+def _chain_id_from_caip2(network: str) -> int:
+    prefix, _, chain_id = network.partition(":")
+    if prefix != "eip155" or not chain_id:
+        raise ValueError(f"unsupported x402 network: {network}")
+    return int(chain_id)
+
+
+def _recover_eip712_payer(
+    requirement: PaymentRequirements,
+    authorization: dict[str, Any],
+    signature: str,
+) -> tuple[str, str | None]:
+    try:
+        from eth_account import Account  # type: ignore[import]
+        from eth_account.messages import encode_typed_data  # type: ignore[import]
+    except ImportError:
+        return "", "eth-account is required for EIP-712 verification"
+
+    try:
+        typed_data = build_eip3009_typed_data(requirement, authorization)
+        signable = encode_typed_data(full_message=typed_data)
+        return Account.recover_message(signable, signature=signature), None
+    except Exception:
+        return "", "invalid EIP-712 payment signature"

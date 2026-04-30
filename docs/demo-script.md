@@ -18,7 +18,8 @@ Point out:
 
 - Human mandate has an allow-list, action list, expiry, and USDC budget.
 - The quote is modeled as x402 v2 on Base Sepolia, and the protected report
-  endpoint verifies a mock `PAYMENT-SIGNATURE` before returning the signal.
+  endpoint verifies quote-bound mock or EIP-712 signed `PAYMENT-SIGNATURE`
+  headers before returning the signal.
 - The RWA action is a Robinhood Chain test stock-token draft, not a live order.
 
 ## 30-50 Seconds
@@ -55,8 +56,10 @@ Close:
 ## Backup CLI
 
 ```bash
-PYTHONPATH=src python scripts/run_demo.py
-python scripts/generate_privacy_proofs.py
-HEADER=$(PYTHONPATH=src python scripts/mint_mock_x402_payment.py --header-only)
+PYTHONPATH=src python3 scripts/run_demo.py
+python3 scripts/generate_privacy_proofs.py
+HEADER=$(PYTHONPATH=src python3 scripts/mint_mock_x402_payment.py --header-only)
 curl -H "PAYMENT-SIGNATURE: $HEADER" http://127.0.0.1:8098/api/x402/sentinel-report
+SIGNED=$(python3 scripts/sign_x402_payment.py --header-only)
+curl -H "PAYMENT-SIGNATURE: $SIGNED" http://127.0.0.1:8098/api/x402/sentinel-report
 ```

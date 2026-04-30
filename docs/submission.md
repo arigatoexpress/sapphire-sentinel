@@ -23,10 +23,11 @@ is the missing control plane.
 
 The demo models an x402 paid-data flow. An agent requests a private RWA signal,
 Sentinel returns a Base Sepolia x402 payment requirement, accepts a mock
-`PAYMENT-SIGNATURE` for the protected report endpoint, binds the quote, checks
-the domain, action, budget, payment amount, prompt-injection language,
-secret-egress risk, and nonce replay protection, then produces either an
-approved payment preview or a blocked receipt. The resulting
+or EIP-712 signed `PAYMENT-SIGNATURE` for the protected report endpoint, binds
+the quote, recovers the payer when a signature is present, checks the domain,
+action, budget, payment amount, prompt-injection language, secret-egress risk,
+and nonce replay protection, then produces either an approved payment preview
+or a blocked receipt. The resulting
 commitments are anchored in `SapphireSentinelRegistry`, a non-custodial
 contract deployed and source-verified on Robinhood Chain testnet. The demo
 includes both an approved payment receipt and a blocked prompt-injection
@@ -70,6 +71,8 @@ Best Agentic Project and Robinhood Chain reserved prize.
 - Run `scripts/mint_mock_x402_payment.py --header-only`, call
   `/api/x402/sentinel-report`, then replay the same header to show a 402 nonce
   rejection.
+- Run `scripts/sign_x402_payment.py --header-only` to show EIP-712 payer
+  recovery without facilitator settlement.
 - Click prompt-injection scenario and show the blocked receipt.
 - Show privacy sidecar commitments.
 - Show `/api/privacy/proofs` for redacted Zama/Aztec proof envelopes.

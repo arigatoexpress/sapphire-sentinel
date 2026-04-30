@@ -13,10 +13,13 @@ dev = [
     "pytest>=8.0",
     "ruff>=0.4",
 ]
+x402 = [
+    "eth-account>=0.13",
+]
 deploy = [
     "py-solc-x>=2.0",
     "web3>=6.0",
-    "eth-account>=0.10",
+    "eth-account>=0.13",
 ]
 
 [tool.ruff]
@@ -30,4 +33,3 @@ ignore = ["E501"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
-

@@ -30,7 +30,7 @@ flowchart LR
 |---|---|
 | Flask demo | Judge-facing control surface and API |
 | Policy engine | Checks domain, action, amount, budget, prompt-injection, secret-egress, nonce, and privacy commitments |
-| x402 model | Simulates v2 payment quote and `PAYMENT-REQUIRED` header shape |
+| x402 model | Simulates v2 payment quote, `PAYMENT-REQUIRED` header shape, nonce replay checks, and optional EIP-712 payer recovery |
 | Network registry | Labels Robinhood, Base, MegaETH, Zama, and Aztec roles without over-claiming |
 | Privacy module | Produces labeled Oasis Sapphire, Zama fhEVM, and Aztec commitments |
 | Privacy proof bundle | Exports local Zama/Aztec proof envelopes with private witnesses redacted |
@@ -49,8 +49,9 @@ testnet.
 EVM testnets, starting with MegaETH testnet:
 
 ```bash
-python scripts/deploy_registry.py --network megaeth_testnet --dry-run
-python scripts/generate_privacy_proofs.py
+python3 scripts/deploy_registry.py --network megaeth_testnet --dry-run
+python3 scripts/generate_privacy_proofs.py
+python3 scripts/sign_x402_payment.py --header-only
 ```
 
 ## Safety Boundary

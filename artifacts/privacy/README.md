@@ -12,7 +12,7 @@ can be copied into `SapphireSentinelRegistry.recordPaymentEvaluation(...)`.
 
 Next implementation step:
 
-1. Inspect the shipped local proof envelope with `python scripts/generate_privacy_proofs.py`.
+1. Inspect the shipped local proof envelope with `python3 scripts/generate_privacy_proofs.py`.
 2. Port the interface to a Zama FHEVM contract using encrypted integer types.
 3. Run local Hardhat mock encryption tests.
 4. Deploy to Zama-on-Sepolia for real encrypted values.
