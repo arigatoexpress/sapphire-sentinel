@@ -15,16 +15,19 @@ The short version: agents can hit paid APIs through an x402-style flow, but Sent
 | x402 requirement model | `src/sapphire_sentinel/x402.py` |
 | Privacy sidecar commitments | `src/sapphire_sentinel/privacy.py` |
 | Zama/Aztec proof bundle | `src/sapphire_sentinel/privacy_proofs.py` |
+| MegaETH mainnet app scout | `src/sapphire_sentinel/megaeth_apps.py` |
 | Red-team scenarios | `src/sapphire_sentinel/scenarios.py` |
 | Flask demo app | `src/sapphire_sentinel/app.py` |
 | Mock x402 buyer header | `scripts/mint_mock_x402_payment.py` |
 | Signed x402 buyer header | `scripts/sign_x402_payment.py` |
 | Privacy artifact generator | `scripts/generate_privacy_proofs.py` |
+| MegaETH read-only scout | `scripts/scout_megaeth_mainnet.py` |
 | Robinhood Chain deploy helper | `scripts/deploy_robinhood_chain.py` |
 | Buildathon plan | `docs/london-buildathon-plan.md` |
 | Research brief | `docs/research.md` |
 | Privacy claims | `docs/privacy-claims.md` |
 | Cross-chain/privacy roadmap | `docs/integration-roadmap.md` |
+| MegaETH mainnet scout | `docs/megaeth-mainnet-scout.md` |
 | Demo script | `docs/demo-script.md` |
 
 ## Safety Defaults
@@ -34,6 +37,7 @@ The short version: agents can hit paid APIs through an x402-style flow, but Sent
 - No Telegram sends.
 - No secret reads.
 - No real funds or custody.
+- MegaETH mainnet mode is read, quote, and simulate only.
 - Contract has no `withdraw`, `.transfer`, or value-moving call path.
 - x402 live settlement is disabled unless a future env-gated testnet mode is added.
 
@@ -95,6 +99,7 @@ python3 scripts/deploy_robinhood_chain.py --dry-run
 python3 scripts/probe_networks.py
 python3 scripts/deploy_registry.py --network megaeth_testnet --dry-run
 python3 scripts/deploy_registry.py --network megaeth_testnet --check --key-alias robinhood_testnet
+python3 scripts/scout_megaeth_mainnet.py --probe-apps
 ```
 
 `--dry-run` compiles the contract and skips deployment. Full deployment requires a funded Robinhood Chain testnet key in `ROBINHOOD_DEPLOY_KEY`.
@@ -109,6 +114,8 @@ only when that burner address has MegaETH testnet gas.
 | `GET /api/scenarios` | Red-team matrix and pass/fail outcomes |
 | `GET /api/privacy` | Oasis/Zama/Aztec sidecar commitments and constraints |
 | `GET /api/privacy/proofs` | Local Zama/Aztec proof bundle with private witnesses redacted |
+| `GET /api/networks` | Network matrix and cross-chain integration roadmap |
+| `GET /api/megaeth/apps` | MegaETH mainnet app registry, guardrails, and unsigned intent templates |
 | `GET /api/x402/paywall` | Simulated x402 v2 `402 Payment Required` with `PAYMENT-REQUIRED` header |
 | `GET /api/x402/sentinel-report` | Protected report unlocked by a bound mock `PAYMENT-SIGNATURE` header |
 | `POST /api/evaluate` | Evaluate an arbitrary paid-resource attempt |
@@ -166,7 +173,8 @@ and the dashboard:
 - MegaETH testnet: deployed low-latency receipt mirror seeded with the same
   mandate, approved receipt, and blocked receipt as Robinhood Chain.
 - MegaETH mainnet: live/TGE-aware read-only profile with chain ID `4326`, RPC
-  `https://mainnet.megaeth.com/rpc`, and MEGA token metadata.
+  `https://mainnet.megaeth.com/rpc`, MEGA token metadata, Rabbithole app
+  discovery, and unsigned intent templates for app experiments.
 - Zama on Sepolia: local encrypted-risk proof bundle and mock contract, with
   real FHEVM deployment next.
 - Aztec: private mandate / intent proof blueprint with exported commitment

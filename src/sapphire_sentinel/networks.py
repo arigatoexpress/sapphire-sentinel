@@ -96,8 +96,8 @@ NETWORKS: tuple[NetworkProfile, ...] = (
         explorer="https://mega.etherscan.io",
         status="mainnet_live_read_only",
         next_action=(
-            "Keep Sentinel read-only on MegaETH mainnet; use it for TGE-aware "
-            "monitoring until explicit real-funds approval."
+            "Keep Sentinel read, quote, and simulate-only on MegaETH mainnet; "
+            "use it for TGE-aware app monitoring without default transactions."
         ),
         claim_boundary="Mainnet is live; Sentinel must not deploy or transact there by default.",
         source="https://docs.megaeth.com/frontier",

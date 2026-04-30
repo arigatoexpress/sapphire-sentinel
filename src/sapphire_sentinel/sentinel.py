@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
+from sapphire_sentinel.megaeth_apps import build_megaeth_mainnet_agent_plan
 from sapphire_sentinel.networks import NETWORKS, build_integration_roadmap, build_network_matrix
 from sapphire_sentinel.privacy import build_privacy_attestations, primary_privacy_commitment
 from sapphire_sentinel.privacy_proofs import build_privacy_proof_bundle
@@ -473,6 +474,7 @@ def build_demo_state() -> dict[str, Any]:
         "network_matrix": build_network_matrix(),
         "integration_roadmap": build_integration_roadmap(),
         "receipt_mirrors": build_receipt_mirrors(),
+        "megaeth_mainnet_agent": build_megaeth_mainnet_agent_plan(),
         "attack_scenarios": _scenario_matrix(),
         "judging_scorecard": build_judging_scorecard(),
         "proof_points": build_proof_points(),
@@ -484,6 +486,7 @@ def build_demo_state() -> dict[str, Any]:
             "human_gated_steps": (
                 "private-key funded deployment",
                 "real x402 facilitator settlement",
+                "MegaETH mainnet swaps, bridges, deposits, or paid app actions",
                 "any live order submission",
             ),
         },

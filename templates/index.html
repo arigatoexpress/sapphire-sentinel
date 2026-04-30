@@ -259,6 +259,16 @@
       </section>
 
       <section>
+        <h2>MegaETH Mainnet Scout</h2>
+        <div class="rows" style="margin-bottom: 10px;">
+          <div class="row"><span>network</span><span id="megaeth-mainnet-network"></span></div>
+          <div class="row"><span>policy</span><span id="megaeth-mainnet-policy"></span></div>
+          <div class="row"><span>tokens</span><span id="megaeth-mainnet-tokens"></span></div>
+        </div>
+        <div class="matrix" id="megaeth-app-list"></div>
+      </section>
+
+      <section>
         <h2>Network Registry</h2>
         <div class="matrix" id="network-list"></div>
       </section>
@@ -505,6 +515,24 @@ function renderMirrors() {
   `).join('');
 }
 
+function renderMegaethMainnet() {
+  const scout = data.megaeth_mainnet_agent;
+  const policy = scout.policy;
+  text('megaeth-mainnet-network', `${scout.network.name} ${scout.network.chain_id}`);
+  text('megaeth-mainnet-policy', `${policy.mode} | sign=${policy.can_sign} | send=${policy.can_send_transactions}`);
+  text('megaeth-mainnet-tokens', Object.entries(scout.tokens).map(([symbol, address]) => `${symbol}:${address}`).join(' | '));
+  document.getElementById('megaeth-app-list').innerHTML = scout.apps.slice(0, 10).map((item) => `
+    <div class="matrix-row">
+      <span>
+        <strong>${linkOrText(item.url, item.name)}</strong>
+        <small>${escapeHtml(item.category.join(', '))} | ${escapeHtml(item.status)}</small>
+        <small>${escapeHtml(item.agent_strategy)}</small>
+      </span>
+      <span class="tag">${escapeHtml(item.execution_policy)}</span>
+    </div>
+  `).join('');
+}
+
 async function evaluateResource(overrides = null) {
   const payload = overrides || {
     resource: document.getElementById('eval-resource').value,
@@ -552,6 +580,7 @@ async function load() {
   renderNetworks();
   renderRoadmap();
   renderMirrors();
+  renderMegaethMainnet();
   renderDecision(data.approved_flow);
   evaluateResource();
 }

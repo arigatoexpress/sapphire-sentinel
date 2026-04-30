@@ -79,13 +79,16 @@ Next code:
 - Keep `liveSettlementEnabled=false` until a testnet wallet signs the payload.
 - Optionally add CDP facilitator config behind env vars for Base mainnet.
 
-### 2. MegaETH Receipt Mirror
+### 2. MegaETH Receipt Mirror and Mainnet App Scout
 
 MegaETH mainnet is live as of the April 30, 2026 TGE. Official docs list chain
 ID `4326`, RPC `https://mainnet.megaeth.com/rpc`, explorers on Blockscout and
 Etherscan, MEGA token `0x28B7E77f82B25B95953825F1E3eA0E36c1c29861`, and an
 Ethereum mainnet standard bridge at `0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75`.
-Sentinel includes this as `megaeth_mainnet` in read-only mode only.
+Sentinel includes this as `megaeth_mainnet` in read-only mode and adds a
+Rabbithole-backed app scout for catalog discovery, featured-app tracking, public
+chain stats, optional public wallet balance reads, and unsigned intent
+templates.
 
 MegaETH testnet chain ID is `6343`, with public RPC
 `https://carrot.megaeth.com/rpc`. Sentinel has deployed the same
@@ -98,7 +101,10 @@ Next code:
 - Keep `scripts/anchor_mirror_receipts.py --network megaeth_testnet --key-alias
   robinhood_testnet` as the replay-safe mirror seeding path.
 - Do not deploy to `megaeth_mainnet` from the default tooling; it is included
-  for TGE-aware monitoring and honest roadmap context only.
+  for TGE-aware monitoring, public app discovery, quote drafting, and simulation
+  context only.
+- Use `scripts/scout_megaeth_mainnet.py --probe-apps` to refresh public
+  Rabbithole app state without reading private keys or sending transactions.
 
 Latest deployment note: MegaETH testnet deployment and receipt seeding completed
 on April 30, 2026. Source verification is still pending.

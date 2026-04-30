@@ -6,6 +6,7 @@ import os
 
 from flask import Flask, jsonify, make_response, render_template, request
 
+from sapphire_sentinel.megaeth_apps import build_megaeth_mainnet_agent_plan
 from sapphire_sentinel.sentinel import (
     build_demo_state,
     build_judging_scorecard,
@@ -69,6 +70,11 @@ def api_networks():
             "integration_roadmap": state["integration_roadmap"],
         }
     )
+
+
+@app.get("/api/megaeth/apps")
+def api_megaeth_apps():
+    return jsonify(build_megaeth_mainnet_agent_plan())
 
 
 @app.get("/api/judging")

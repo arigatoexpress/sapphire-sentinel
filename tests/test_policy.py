@@ -79,6 +79,8 @@ def test_demo_state_is_safe_by_default():
     assert len(state["privacy_proofs"]["artifacts"]) == 2
     assert len(state["network_matrix"]) >= 5
     assert len(state["integration_roadmap"]) == 4
+    assert state["megaeth_mainnet_agent"]["policy"]["can_send_transactions"] is False
+    assert len(state["megaeth_mainnet_agent"]["apps"]) >= 8
     assert {item["id"] for item in state["receipt_mirrors"]} >= {
         "megaeth_testnet",
         "megaeth_mainnet",
