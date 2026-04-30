@@ -14,9 +14,11 @@ The short version: agents can hit paid APIs through an x402-style flow, but Sent
 | Policy engine | `src/sapphire_sentinel/sentinel.py` |
 | x402 requirement model | `src/sapphire_sentinel/x402.py` |
 | Privacy sidecar commitments | `src/sapphire_sentinel/privacy.py` |
+| Zama/Aztec proof bundle | `src/sapphire_sentinel/privacy_proofs.py` |
 | Red-team scenarios | `src/sapphire_sentinel/scenarios.py` |
 | Flask demo app | `src/sapphire_sentinel/app.py` |
 | Mock x402 buyer header | `scripts/mint_mock_x402_payment.py` |
+| Privacy artifact generator | `scripts/generate_privacy_proofs.py` |
 | Robinhood Chain deploy helper | `scripts/deploy_robinhood_chain.py` |
 | Buildathon plan | `docs/london-buildathon-plan.md` |
 | Research brief | `docs/research.md` |
@@ -57,6 +59,7 @@ Backup CLI:
 
 ```bash
 PYTHONPATH=src python scripts/run_demo.py
+python scripts/generate_privacy_proofs.py
 ```
 
 Protected x402 report demo:
@@ -90,6 +93,7 @@ python scripts/deploy_registry.py --network megaeth_testnet --dry-run
 | `GET /api/demo` | Full judge-facing demo state |
 | `GET /api/scenarios` | Red-team matrix and pass/fail outcomes |
 | `GET /api/privacy` | Oasis/Zama/Aztec sidecar commitments and constraints |
+| `GET /api/privacy/proofs` | Local Zama/Aztec proof bundle with private witnesses redacted |
 | `GET /api/x402/paywall` | Simulated x402 v2 `402 Payment Required` with `PAYMENT-REQUIRED` header |
 | `GET /api/x402/sentinel-report` | Protected report unlocked by a bound mock `PAYMENT-SIGNATURE` header |
 | `POST /api/evaluate` | Evaluate an arbitrary paid-resource attempt |
@@ -145,8 +149,10 @@ and the dashboard:
   quote binding, and nonce replay rejection; next step is real wallet-signed
   testnet settlement.
 - MegaETH testnet: deploy-ready low-latency receipt mirror.
-- Zama on Sepolia: encrypted budget/risk gate artifact path.
-- Aztec: private mandate / intent proof blueprint.
+- Zama on Sepolia: local encrypted-risk proof bundle and mock contract, with
+  real FHEVM deployment next.
+- Aztec: private mandate / intent proof blueprint with exported commitment
+  surfaced in `/api/privacy/proofs`.
 
 The public claim stays tight: privacy sidecars export commitments to public
 receipts; they are not private Robinhood Chain payments.

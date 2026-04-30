@@ -12,16 +12,20 @@ can be copied into `SapphireSentinelRegistry.recordPaymentEvaluation(...)`.
 
 Next implementation step:
 
-1. Port the interface to a Zama FHEVM contract using encrypted integer types.
-2. Run local Hardhat mock encryption tests.
-3. Deploy to Zama-on-Sepolia for real encrypted values.
-4. Anchor the resulting risk commitment on Robinhood Chain and MegaETH.
+1. Inspect the shipped local proof envelope with `python scripts/generate_privacy_proofs.py`.
+2. Port the interface to a Zama FHEVM contract using encrypted integer types.
+3. Run local Hardhat mock encryption tests.
+4. Deploy to Zama-on-Sepolia for real encrypted values.
+5. Anchor the resulting risk commitment on Robinhood Chain and MegaETH.
 
 ## Aztec
 
 `aztec_private_intent_note.nr` is a Noir blueprint for private mandate evidence.
 It proves privately that a balance and risk score satisfy public thresholds,
 then exports a commitment for the public receipt path.
+
+`/api/privacy/proofs` now exposes the local proof-output envelope that the Noir
+proof should eventually produce.
 
 Boundary:
 

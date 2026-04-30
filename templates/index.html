@@ -266,6 +266,11 @@
       </section>
 
       <section>
+        <h2>Privacy Proof Bundle</h2>
+        <div class="proof" id="privacy-proof-list"></div>
+      </section>
+
+      <section>
         <h2>Proof Points</h2>
         <div class="proof" id="proof-list"></div>
       </section>
@@ -422,6 +427,19 @@ function renderPrivacy() {
   `).join('');
 }
 
+function renderPrivacyProofs() {
+  document.getElementById('privacy-proof-list').innerHTML = data.privacy_proofs.artifacts.map((item) => `
+    <div class="proof-row">
+      <span>
+        <strong>${escapeHtml(item.engine)}</strong>
+        <span>${escapeHtml(item.exported_commitment)}</span>
+        <span>${escapeHtml(item.artifact_path)}</span>
+      </span>
+      <span class="pill ok">${escapeHtml(item.status)}</span>
+    </div>
+  `).join('');
+}
+
 function renderScorecard() {
   document.getElementById('scorecard').innerHTML = data.judging_scorecard.map((item) => `
     <div class="score-row">
@@ -510,6 +528,7 @@ async function load() {
   text('mode', `${data.project.mode} | ${data.attack_scenarios.filter((item) => item.passed).length}/${data.attack_scenarios.length} checks`);
   renderScenarios();
   renderPrivacy();
+  renderPrivacyProofs();
   renderScorecard();
   renderProofPoints();
   renderNetworks();

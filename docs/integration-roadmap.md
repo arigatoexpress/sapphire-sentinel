@@ -23,8 +23,8 @@ pretending those systems do the same job.
 | Robinhood Chain testnet | Live | Source-verified non-custodial registry with approved and blocked agent receipts |
 | Base Sepolia x402 | Local gate shipped | HTTP 402 payment requirement plus mock `PAYMENT-SIGNATURE` verification, quote binding, and replay rejection |
 | MegaETH testnet | Deploy-ready | Low-latency public receipt mirror for pre-action agent controls |
-| Zama on Sepolia | Artifact next | Encrypted budget/risk thresholding can export a commitment to the public receipt |
-| Aztec | Blueprint next | Private mandate or intent evidence can export a public commitment |
+| Zama on Sepolia | Local proof bundle shipped | Encrypted budget/risk thresholding has a mock contract plus receipt-bound local commitment |
+| Aztec | Local proof bundle shipped | Private mandate or intent evidence has a Noir blueprint plus exported local commitment |
 
 ## Correct Claims
 
@@ -105,6 +105,8 @@ Next code:
 
 - Use `contracts/privacy/EncryptedRiskGateMock.sol` as the local interface
   contract.
+- Use `/api/privacy/proofs` or `scripts/generate_privacy_proofs.py` to show the
+  receipt-bound encrypted-risk commitment and redacted witness shape.
 - Port that interface to encrypted integer types in a Zama Hardhat project.
 - Feed the resulting `riskCommitment` into the existing Robinhood receipt.
 - Label this as Zama-on-Sepolia until actually deployed and verified.
@@ -119,6 +121,8 @@ Next code:
 
 - Keep `artifacts/privacy/aztec_private_intent_note.nr` as the private-intent
   blueprint.
+- Use `/api/privacy/proofs` as the local proof-output envelope until the Aztec
+  toolchain is installed.
 - Add a local proof-output JSON once the Aztec toolchain is installed.
 - Anchor only the exported commitment in Sentinel receipts.
 

@@ -19,6 +19,7 @@ from urllib.parse import urlparse
 
 from sapphire_sentinel.networks import build_integration_roadmap, build_network_matrix
 from sapphire_sentinel.privacy import build_privacy_attestations, primary_privacy_commitment
+from sapphire_sentinel.privacy_proofs import build_privacy_proof_bundle
 from sapphire_sentinel.x402 import (
     DEFAULT_USDC_CONTRACTS,
     PaymentRequirements,
@@ -426,6 +427,15 @@ def build_demo_state() -> dict[str, Any]:
     mandate = default_mandate()
     approved = evaluate_attempt(default_attempt(), mandate)
     blocked = evaluate_attempt(blocked_attempt(), mandate)
+    privacy_proofs = build_privacy_proof_bundle(
+        policy_hash=approved.policy_hash,
+        resource_hash=approved.resource_hash,
+        result_hash=approved.result_hash,
+        risk_hash=approved.risk_hash,
+        privacy_commitment=approved.privacy_commitment,
+        amount_atomic=default_attempt().amount_atomic,
+        approved=approved.approved,
+    )
     return {
         "project": {
             "name": "Sapphire Sentinel",
@@ -459,6 +469,7 @@ def build_demo_state() -> dict[str, Any]:
                 resource_hash=approved.resource_hash,
             )
         ],
+        "privacy_proofs": privacy_proofs.to_dict(),
         "network_matrix": build_network_matrix(),
         "integration_roadmap": build_integration_roadmap(),
         "attack_scenarios": _scenario_matrix(),
@@ -572,6 +583,11 @@ def build_proof_points() -> list[dict[str, str]]:
             "label": "x402 protected report",
             "status": "mock-verified",
             "evidence": "/api/x402/sentinel-report",
+        },
+        {
+            "label": "Zama/Aztec proof bundle",
+            "status": "local-artifact",
+            "evidence": "/api/privacy/proofs",
         },
         {
             "label": "Live order path",

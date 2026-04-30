@@ -21,6 +21,11 @@ def test_network_registry_has_core_hackathon_rails():
 def test_integration_roadmap_preserves_honest_boundaries():
     roadmap = build_integration_roadmap()
 
-    assert [item["status"] for item in roadmap] == ["shipping", "local_shipped", "next", "blueprint"]
+    assert [item["status"] for item in roadmap] == [
+        "shipping",
+        "local_shipped",
+        "local_shipped",
+        "local_shipped",
+    ]
     assert any("Do not claim native Robinhood Chain FHE" in item["boundary"] for item in roadmap)
     assert network_by_id("megaeth_testnet").rpc == "https://carrot.megaeth.com/rpc"

@@ -39,8 +39,8 @@ Pitch:
 
 > Robinhood Chain stays public. Sensitive policy inputs stay in privacy sidecars.
 > Oasis Sapphire is the first real implementation target; Zama and Aztec are
-> companion artifacts for encrypted risk math and private intent evidence. Base
-> gives us the x402 rail, and MegaETH is the low-latency receipt mirror.
+> companion proof bundles for encrypted risk math and private intent evidence.
+> Base gives us the x402 gate, and MegaETH is the low-latency receipt mirror.
 
 ## 70-90 Seconds
 
@@ -56,6 +56,7 @@ Close:
 
 ```bash
 PYTHONPATH=src python scripts/run_demo.py
+python scripts/generate_privacy_proofs.py
 HEADER=$(PYTHONPATH=src python scripts/mint_mock_x402_payment.py --header-only)
 curl -H "PAYMENT-SIGNATURE: $HEADER" http://127.0.0.1:8098/api/x402/sentinel-report
 ```

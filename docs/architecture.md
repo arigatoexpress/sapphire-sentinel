@@ -33,6 +33,7 @@ flowchart LR
 | x402 model | Simulates v2 payment quote and `PAYMENT-REQUIRED` header shape |
 | Network registry | Labels Robinhood, Base, MegaETH, Zama, and Aztec roles without over-claiming |
 | Privacy module | Produces labeled Oasis Sapphire, Zama fhEVM, and Aztec commitments |
+| Privacy proof bundle | Exports local Zama/Aztec proof envelopes with private witnesses redacted |
 | Contract | Records mandates and payment evaluations on Robinhood Chain testnet |
 
 ## Deployment
@@ -49,6 +50,7 @@ EVM testnets, starting with MegaETH testnet:
 
 ```bash
 python scripts/deploy_registry.py --network megaeth_testnet --dry-run
+python scripts/generate_privacy_proofs.py
 ```
 
 ## Safety Boundary

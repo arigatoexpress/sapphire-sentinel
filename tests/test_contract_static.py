@@ -4,6 +4,7 @@ import re
 from pathlib import Path
 
 CONTRACT = Path(__file__).resolve().parents[1] / "contracts" / "SapphireSentinelRegistry.sol"
+ZAMA_MOCK = Path(__file__).resolve().parents[1] / "contracts" / "privacy" / "EncryptedRiskGateMock.sol"
 
 
 def test_contract_is_non_custodial():
@@ -51,6 +52,18 @@ def test_contract_has_two_step_operator_transfer():
     assert 'require(msg.sender == pendingOperator, "Not pending operator")' in accept_fn
     assert "operator = pendingOperator;" in accept_fn
     assert "pendingOperator = address(0);" in accept_fn
+
+
+def test_zama_mock_exports_receipt_compatible_commitment():
+    src = ZAMA_MOCK.read_text(encoding="utf-8")
+    evaluate_fn = _extract_function(src, "evaluateEncryptedRisk")
+
+    assert "contract EncryptedRiskGateMock" in src
+    assert "bytes32 encryptedInputCommitment" in src
+    assert "bytes32 riskCommitment" in src
+    assert "event RiskEvaluated(" in src
+    assert '"sapphire-sentinel-zama-risk-v1"' in evaluate_fn
+    assert 'require(decisions[decisionId].createdAt == 0, "Decision exists")' in evaluate_fn
 
 
 def _extract_function(src: str, name: str) -> str:

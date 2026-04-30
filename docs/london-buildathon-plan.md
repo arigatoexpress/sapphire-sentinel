@@ -19,8 +19,8 @@ receipt hash is anchored on-chain.
 - The cybersecurity angle is concrete: Sentinel blocks unsafe domains, prompt
   injection, secret-exfiltration language, and budget violations.
 - The privacy story is buildable: exact portfolio/risk inputs stay off-chain;
-  only `policyHash`, `resultHash`, `riskHash`, and `privacyCommitment` land
-  on-chain.
+  only `policyHash`, `resultHash`, `riskHash`, proof commitments, and
+  `privacyCommitment` land on-chain.
 - The demo is safe by default: no live Robinhood orders, no real Telegram
   sends, no secret reads, and no production funds.
 
@@ -47,6 +47,7 @@ receipt hash is anchored on-chain.
 | Mandate/receipt contract | `contracts/SapphireSentinelRegistry.sol` |
 | Policy evaluator | `src/sapphire_sentinel/sentinel.py` |
 | Privacy commitments | `src/sapphire_sentinel/privacy.py` |
+| Privacy proof bundle | `src/sapphire_sentinel/privacy_proofs.py`, `/api/privacy/proofs` |
 | Red-team scenarios | `src/sapphire_sentinel/scenarios.py` |
 | Dashboard page | `templates/index.html` |
 | Demo APIs | `/api/demo`, `/api/evaluate`, `/api/x402/paywall`, `/api/x402/sentinel-report` |
@@ -75,7 +76,6 @@ receipt hash is anchored on-chain.
 1. Record and upload the 90-second video.
 2. Add a focused Oasis Sapphire sidecar contract for confidential policy
    evaluation.
-3. Add a small Zama/FHEVM local mock that produces the `resultHash` and
-   `riskHash` from hidden basket weights.
+3. Port the shipped Zama proof bundle to encrypted integer types on Sepolia.
 4. Record a 90-second demo: approved payment, blocked injection attempt,
    Robinhood Chain explorer receipt, and non-submitting RWA order draft.

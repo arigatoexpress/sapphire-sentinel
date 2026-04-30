@@ -55,6 +55,11 @@ def api_privacy():
     return jsonify(build_demo_state()["privacy_attestations"])
 
 
+@app.get("/api/privacy/proofs")
+def api_privacy_proofs():
+    return jsonify(build_demo_state()["privacy_proofs"])
+
+
 @app.get("/api/networks")
 def api_networks():
     state = build_demo_state()
