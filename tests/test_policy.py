@@ -79,6 +79,13 @@ def test_demo_state_is_safe_by_default():
     assert len(state["privacy_proofs"]["artifacts"]) == 2
     assert len(state["network_matrix"]) >= 5
     assert len(state["integration_roadmap"]) == 4
+    assert {item["id"] for item in state["receipt_mirrors"]} >= {
+        "megaeth_testnet",
+        "megaeth_mainnet",
+    }
+    assert next(item for item in state["receipt_mirrors"] if item["id"] == "megaeth_testnet")[
+        "status"
+    ] in {"mirror_seeded", "deployed_unverified", "ready_to_deploy"}
     assert len(state["judging_scorecard"]) == 4
     assert len(state["proof_points"]) >= 4
     assert any(item["label"] == "x402 protected report" for item in state["proof_points"])

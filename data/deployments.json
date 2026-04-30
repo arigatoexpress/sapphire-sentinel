@@ -42,5 +42,55 @@
         }
       }
     }
+  },
+  "megaeth_testnet": {
+    "chain_id": 6343,
+    "rpc": "https://carrot.megaeth.com/rpc",
+    "contracts": {
+      "SapphireSentinelRegistry": {
+        "address": "0x2EBB91F7B376cB821d90ac4A7d77B0d06b70B36F",
+        "tx_hash": "0x58adfaab54453a1d2874ca0320d6f60e6ee4975d2fee47864716dec1f65b2928",
+        "explorer": "https://megaeth-testnet-v2.blockscout.com/address/0x2EBB91F7B376cB821d90ac4A7d77B0d06b70B36F",
+        "tx_explorer": "https://megaeth-testnet-v2.blockscout.com/tx/0x58adfaab54453a1d2874ca0320d6f60e6ee4975d2fee47864716dec1f65b2928",
+        "role": "receipt_mirror",
+        "mirror_of": "robinhood_testnet",
+        "chain_id": 6343,
+        "network_id": "megaeth_testnet",
+        "claim_boundary": "Experimental testnet; RPCs are rate-limited and state may be reset.",
+        "source_verified": false,
+        "demo_events": {
+          "mandate_id": "sentinel-london-demo-v1",
+          "mandate_hash": "0xbf6ecfa739d5589e81349d87852e5f5beaa629c5a40dfdc6fa7cbf59276eb3f1",
+          "controller": "0xa11ce00000000000000000000000000000004026",
+          "agent": "0xa6e1700000000000000000000000000000000402",
+          "register_mandate": {
+            "tx_hash": "0xffa22f69c507a7d01ea448ec7cb2d935b9ea6a6a27d49d2be467fdf8e7722bf2",
+            "explorer": "https://megaeth-testnet-v2.blockscout.com/tx/0xffa22f69c507a7d01ea448ec7cb2d935b9ea6a6a27d49d2be467fdf8e7722bf2"
+          },
+          "seed_prior_spend": {
+            "tx_hash": "0xdbfacaa4d356253c685c9f6bf2a63da5c50d313c7dc3f765fcc3edc6627ea881",
+            "explorer": "https://megaeth-testnet-v2.blockscout.com/tx/0xdbfacaa4d356253c685c9f6bf2a63da5c50d313c7dc3f765fcc3edc6627ea881",
+            "receipt_id": "0x4cd7cd593b49453f2b1a113b33c9c51152e1e0e8faaa42f2da05036b50508c19"
+          },
+          "approved_receipt": {
+            "tx_hash": "0xcc94e0ed30bc2c8ef7eebffffe8eca0c4f3a4c9d3a4deacc5e6b919787e0cf46",
+            "explorer": "https://megaeth-testnet-v2.blockscout.com/tx/0xcc94e0ed30bc2c8ef7eebffffe8eca0c4f3a4c9d3a4deacc5e6b919787e0cf46",
+            "receipt_id": "0x7150919013712c3a3122718f735814164f32e0835b815d0c5bf1d88dc8eea045"
+          },
+          "blocked_receipt": {
+            "tx_hash": "0x13d83ae21755c9bcdec16a546c0fbf978666652ff32150a5633c076070252065",
+            "explorer": "https://megaeth-testnet-v2.blockscout.com/tx/0x13d83ae21755c9bcdec16a546c0fbf978666652ff32150a5633c076070252065",
+            "receipt_id": "0x89a4b9b6e5ce55c17984d2e90d631d4514ea3176f062f61828cc1a5c74b815d7"
+          },
+          "updated_at": 1777566654,
+          "remaining_spend_atomic": 1618000,
+          "remaining_spend_usdc": "1.618"
+        }
+      }
+    },
+    "name": "MegaETH Testnet",
+    "role": "low-latency receipt mirror",
+    "claim_boundary": "Experimental testnet; RPCs are rate-limited and state may be reset.",
+    "deployed_at": 1777566583
   }
 }

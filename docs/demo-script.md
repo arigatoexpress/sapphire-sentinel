@@ -41,7 +41,8 @@ Pitch:
 > Robinhood Chain stays public. Sensitive policy inputs stay in privacy sidecars.
 > Oasis Sapphire is the first real implementation target; Zama and Aztec are
 > companion proof bundles for encrypted risk math and private intent evidence.
-> Base gives us the x402 gate, and MegaETH is the low-latency receipt mirror.
+> Base gives us the x402 gate, and MegaETH is now the low-latency testnet
+> receipt mirror, with mainnet kept read-only for TGE context.
 
 ## 70-90 Seconds
 

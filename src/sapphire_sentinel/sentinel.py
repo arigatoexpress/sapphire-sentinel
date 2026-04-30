@@ -17,7 +17,7 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
-from sapphire_sentinel.networks import build_integration_roadmap, build_network_matrix
+from sapphire_sentinel.networks import NETWORKS, build_integration_roadmap, build_network_matrix
 from sapphire_sentinel.privacy import build_privacy_attestations, primary_privacy_commitment
 from sapphire_sentinel.privacy_proofs import build_privacy_proof_bundle
 from sapphire_sentinel.x402 import (
@@ -472,6 +472,7 @@ def build_demo_state() -> dict[str, Any]:
         "privacy_proofs": privacy_proofs.to_dict(),
         "network_matrix": build_network_matrix(),
         "integration_roadmap": build_integration_roadmap(),
+        "receipt_mirrors": build_receipt_mirrors(),
         "attack_scenarios": _scenario_matrix(),
         "judging_scorecard": build_judging_scorecard(),
         "proof_points": build_proof_points(),
@@ -509,7 +510,7 @@ def evaluate_from_payload(payload: dict[str, Any]) -> dict[str, Any]:
 
 
 def build_chain_config() -> dict[str, Any]:
-    deployment = load_deployment()
+    deployment = load_contract_deployment("robinhood_testnet")
     return {
         "network": "Robinhood Chain Testnet",
         "chain_id": ROBINHOOD_CHAIN_ID,
@@ -525,6 +526,40 @@ def build_chain_config() -> dict[str, Any]:
         "terms": "testnet tokens have no monetary value and may be reset",
         "deployment": deployment,
     }
+
+
+def build_receipt_mirrors() -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for network in NETWORKS:
+        if network.id == "robinhood_testnet":
+            continue
+        if "megaeth" not in network.id:
+            continue
+        deployment = load_contract_deployment(network.id)
+        address = deployment.get("address")
+        demo_events = deployment.get("demo_events") or {}
+        rows.append(
+            {
+                "id": network.id,
+                "name": network.name,
+                "role": network.role,
+                "chain_id": network.chain_id,
+                "caip2": network.caip2,
+                "deploy_enabled": network.deploy_enabled,
+                "status": _mirror_status(network.id, deployment),
+                "contract_address": address,
+                "tx_hash": deployment.get("tx_hash"),
+                "explorer": deployment.get("explorer") or network.explorer,
+                "tx_explorer": deployment.get("tx_explorer"),
+                "source_verified": bool(deployment.get("source_verified")),
+                "demo_events": demo_events,
+                "approved_receipt_explorer": (demo_events.get("approved_receipt") or {}).get("explorer"),
+                "blocked_receipt_explorer": (demo_events.get("blocked_receipt") or {}).get("explorer"),
+                "claim_boundary": network.claim_boundary,
+                "metadata": network.metadata,
+            }
+        )
+    return rows
 
 
 def build_judging_scorecard() -> list[dict[str, str]]:
@@ -562,7 +597,9 @@ def build_judging_scorecard() -> list[dict[str, str]]:
 
 def build_proof_points() -> list[dict[str, str]]:
     deployment = load_deployment()
+    megaeth = load_contract_deployment("megaeth_testnet")
     demo_events = deployment.get("demo_events") or {}
+    megaeth_events = megaeth.get("demo_events") or {}
     return [
         {
             "label": "Source-verified registry",
@@ -578,6 +615,20 @@ def build_proof_points() -> list[dict[str, str]]:
             "label": "Blocked receipt",
             "status": "anchored" if (demo_events.get("blocked_receipt") or {}).get("tx_hash") else "preview",
             "evidence": (demo_events.get("blocked_receipt") or {}).get("explorer", ""),
+        },
+        {
+            "label": "MegaETH mirror",
+            "status": (
+                "seeded"
+                if (megaeth_events.get("approved_receipt") or {}).get("tx_hash")
+                else "deployed"
+                if megaeth.get("address")
+                else "ready"
+            ),
+            "evidence": (
+                (megaeth_events.get("approved_receipt") or {}).get("explorer")
+                or megaeth.get("explorer", "")
+            ),
         },
         {
             "label": "x402 protected report",
@@ -598,6 +649,10 @@ def build_proof_points() -> list[dict[str, str]]:
 
 
 def load_deployment() -> dict[str, Any]:
+    return load_contract_deployment("robinhood_testnet")
+
+
+def load_contract_deployment(network_id: str) -> dict[str, Any]:
     if not DEPLOYMENTS_FILE.exists():
         return {}
     try:
@@ -605,10 +660,20 @@ def load_deployment() -> dict[str, Any]:
     except (OSError, json.JSONDecodeError):
         return {}
     return (
-        deployments.get("robinhood_testnet", {})
+        deployments.get(network_id, {})
         .get("contracts", {})
         .get("SapphireSentinelRegistry", {})
     )
+
+
+def _mirror_status(network_id: str, deployment: dict[str, Any]) -> str:
+    if network_id == "megaeth_mainnet":
+        return "read_only_mainnet"
+    if not deployment.get("address"):
+        return "ready_to_deploy"
+    if (deployment.get("demo_events") or {}).get("approved_receipt"):
+        return "mirror_seeded"
+    return "deployed_unverified"
 
 
 def _demo_receipt_record(demo_events: dict[str, Any], approved: bool, receipt_id: str) -> dict[str, Any]:

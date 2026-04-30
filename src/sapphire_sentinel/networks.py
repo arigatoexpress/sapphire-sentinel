@@ -7,7 +7,7 @@ drifting into over-claiming while still showing judges the expansion path.
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from typing import Any
 
 
@@ -24,6 +24,8 @@ class NetworkProfile:
     next_action: str
     claim_boundary: str
     source: str
+    deploy_enabled: bool = False
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -54,6 +56,7 @@ NETWORKS: tuple[NetworkProfile, ...] = (
         next_action="Keep source-verified receipt registry as the judging anchor.",
         claim_boundary="Public testnet receipts only; no real Robinhood account or live order flow.",
         source="https://docs.robinhood.com/chain/",
+        deploy_enabled=True,
     ),
     NetworkProfile(
         id="base_sepolia",
@@ -67,6 +70,7 @@ NETWORKS: tuple[NetworkProfile, ...] = (
         next_action="Replace the local mock header with wallet-signed Base Sepolia USDC and facilitator verification.",
         claim_boundary="Local verifier only today; no facilitator settlement or production CDP call by default.",
         source="https://docs.x402.org/core-concepts/network-and-token-support",
+        deploy_enabled=True,
     ),
     NetworkProfile(
         id="megaeth_testnet",
@@ -76,10 +80,34 @@ NETWORKS: tuple[NetworkProfile, ...] = (
         caip2="eip155:6343",
         rpc="https://carrot.megaeth.com/rpc",
         explorer="https://megaeth-testnet-v2.blockscout.com",
-        status="deploy_ready",
-        next_action="Deploy SapphireSentinelRegistry as a fast mirror for agent-control receipts.",
+        status="mirror_seeded",
+        next_action="Verify source on MegaETH testnet Blockscout and keep mirror receipts aligned.",
         claim_boundary="Experimental testnet; RPCs are rate-limited and state may be reset.",
         source="https://docs.megaeth.com/testnet",
+        deploy_enabled=True,
+    ),
+    NetworkProfile(
+        id="megaeth_mainnet",
+        name="MegaETH Mainnet",
+        role="live TGE/mainnet context",
+        chain_id=4326,
+        caip2="eip155:4326",
+        rpc="https://mainnet.megaeth.com/rpc",
+        explorer="https://mega.etherscan.io",
+        status="mainnet_live_read_only",
+        next_action=(
+            "Keep Sentinel read-only on MegaETH mainnet; use it for TGE-aware "
+            "monitoring until explicit real-funds approval."
+        ),
+        claim_boundary="Mainnet is live; Sentinel must not deploy or transact there by default.",
+        source="https://docs.megaeth.com/frontier",
+        deploy_enabled=False,
+        metadata={
+            "MEGA": "0x28B7E77f82B25B95953825F1E3eA0E36c1c29861",
+            "WETH9": "0x4200000000000000000000000000000000000006",
+            "USDM": "0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7",
+            "ethereum_l1_standard_bridge": "0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75",
+        },
     ),
     NetworkProfile(
         id="zama_sepolia",
@@ -114,9 +142,9 @@ INTEGRATION_PHASES: tuple[IntegrationPhase, ...] = (
     IntegrationPhase(
         label="1. Receipt Mesh",
         status="shipping",
-        proof="Robinhood Chain registry deployed, source-verified, and seeded with approved/blocked receipts.",
-        implementation="Generalize registry deployment to MegaETH and Base Sepolia with dry-run preflights.",
-        boundary="Testnet receipts are public commitments, not private settlement or real orders.",
+        proof="Robinhood Chain and MegaETH testnet registries are deployed and seeded with approved/blocked receipts.",
+        implementation="Keep Robinhood as source-verified primary anchor and MegaETH as low-latency mirror.",
+        boundary="Testnet receipts are public commitments; MegaETH mainnet remains read-only by default.",
     ),
     IntegrationPhase(
         label="2. Base x402 Rail",

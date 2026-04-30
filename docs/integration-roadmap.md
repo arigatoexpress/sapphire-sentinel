@@ -22,7 +22,8 @@ pretending those systems do the same job.
 |---|---|---|
 | Robinhood Chain testnet | Live | Source-verified non-custodial registry with approved and blocked agent receipts |
 | Base Sepolia x402 | Local gate shipped | HTTP 402 payment requirement plus mock `PAYMENT-SIGNATURE` verification, quote binding, and replay rejection |
-| MegaETH testnet | Deploy-ready | Low-latency public receipt mirror for pre-action agent controls |
+| MegaETH testnet | Mirror seeded | Low-latency public receipt mirror with mandate, approved receipt, and blocked receipt |
+| MegaETH mainnet | Read-only live context | TGE-aware network profile with MEGA/USDM/bridge metadata and no default deployment path |
 | Zama on Sepolia | Local proof bundle shipped | Encrypted budget/risk thresholding has a mock contract plus receipt-bound local commitment |
 | Aztec | Local proof bundle shipped | Private mandate or intent evidence has a Noir blueprint plus exported local commitment |
 
@@ -80,23 +81,27 @@ Next code:
 
 ### 2. MegaETH Receipt Mirror
 
+MegaETH mainnet is live as of the April 30, 2026 TGE. Official docs list chain
+ID `4326`, RPC `https://mainnet.megaeth.com/rpc`, explorers on Blockscout and
+Etherscan, MEGA token `0x28B7E77f82B25B95953825F1E3eA0E36c1c29861`, and an
+Ethereum mainnet standard bridge at `0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75`.
+Sentinel includes this as `megaeth_mainnet` in read-only mode only.
+
 MegaETH testnet chain ID is `6343`, with public RPC
-`https://carrot.megaeth.com/rpc`. Sentinel can deploy the same
-`SapphireSentinelRegistry` as a low-latency receipt mirror.
+`https://carrot.megaeth.com/rpc`. Sentinel has deployed the same
+`SapphireSentinelRegistry` as a low-latency receipt mirror and seeded the demo
+mandate, prior spend, approved receipt, and blocked receipt.
 
 Next code:
 
-- Use `scripts/deploy_registry.py --network megaeth_testnet --dry-run`.
-- Run `--check --key-alias robinhood_testnet` only after the shared burner
-  address has MegaETH testnet ETH.
-- Deploy only if the RPC preflight passes and the testnet key has enough gas.
-- Record the MegaETH address under `data/deployments.json` without overwriting
-  Robinhood Chain metadata.
+- Verify the MegaETH testnet source on Blockscout.
+- Keep `scripts/anchor_mirror_receipts.py --network megaeth_testnet --key-alias
+  robinhood_testnet` as the replay-safe mirror seeding path.
+- Do not deploy to `megaeth_mainnet` from the default tooling; it is included
+  for TGE-aware monitoring and honest roadmap context only.
 
-Latest preflight note: the public MegaETH RPC reported chain ID `6343`, but the
-current local burner has zero MegaETH testnet ETH. Fund the burner address from
-the MegaETH faucet, then rerun `scripts/deploy_registry.py --network
-megaeth_testnet --check --key-alias robinhood_testnet`.
+Latest deployment note: MegaETH testnet deployment and receipt seeding completed
+on April 30, 2026. Source verification is still pending.
 
 ### 3. Zama Encrypted Risk Gate
 
@@ -153,6 +158,7 @@ runtime data, or private production configs.
 - Coinbase x402: `https://docs.cdp.coinbase.com/x402/welcome`
 - Base RPC docs: `https://docs.base.org/base-chain/api-reference/rpc-overview`
 - MegaETH testnet: `https://docs.megaeth.com/testnet`
+- MegaETH mainnet: `https://docs.megaeth.com/frontier`
 - MegaETH RPC: `https://docs.megaeth.com/rpc`
 - Zama Solidity guides: `https://docs.zama.org/protocol/solidity-guides`
 - Zama FHEVM runtime modes: `https://docs.zama.org/protocol/solidity-guides/development-guide/hardhat/run_test`

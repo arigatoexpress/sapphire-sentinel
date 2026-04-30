@@ -97,3 +97,4 @@ def test_supporting_endpoints_are_present():
     assert len(client.get("/api/privacy/proofs").get_json()["artifacts"]) == 2
     assert len(client.get("/api/networks").get_json()["networks"]) >= 5
     assert len(client.get("/api/judging").get_json()) == 4
+    assert len(client.get("/api/demo").get_json()["receipt_mirrors"]) >= 2

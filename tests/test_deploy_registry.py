@@ -39,3 +39,11 @@ def test_deploy_key_alias_error_names_alias(monkeypatch, tmp_path):
 
     with pytest.raises(RuntimeError, match="via alias robinhood_testnet"):
         module.load_private_key("megaeth_testnet", key_alias="robinhood_testnet")
+
+
+def test_deployable_networks_exclude_megaeth_mainnet():
+    module = _load_deploy_registry()
+    deployable = sorted(n.id for n in module.NETWORKS if n.deploy_enabled and n.chain_id and n.rpc)
+
+    assert "megaeth_testnet" in deployable
+    assert "megaeth_mainnet" not in deployable

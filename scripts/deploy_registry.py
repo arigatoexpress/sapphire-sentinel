@@ -43,7 +43,7 @@ logging.basicConfig(level=logging.INFO, format="%(levelname)s  %(message)s")
 
 
 def main() -> int:
-    deployable = sorted(n.id for n in NETWORKS if n.chain_id and n.rpc)
+    deployable = sorted(n.id for n in NETWORKS if n.deploy_enabled and n.chain_id and n.rpc)
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--network", default="robinhood_testnet", choices=deployable)
     parser.add_argument(
@@ -204,12 +204,20 @@ def write_deployment(network: NetworkProfile, address: str, tx_hash: str) -> Non
     )
     chain["chain_id"] = network.chain_id
     chain["rpc"] = network.rpc
+    chain["name"] = network.name
+    chain["role"] = network.role
+    chain["claim_boundary"] = network.claim_boundary
     chain["deployed_at"] = int(time.time())
     chain.setdefault("contracts", {})[CONTRACT_NAME] = {
         "address": address,
         "tx_hash": tx_hash,
         "explorer": f"{network.explorer}/address/{address}" if network.explorer else None,
         "tx_explorer": f"{network.explorer}/tx/{tx_hash}" if network.explorer else None,
+        "role": "primary_anchor" if network.id == "robinhood_testnet" else "receipt_mirror",
+        "mirror_of": None if network.id == "robinhood_testnet" else "robinhood_testnet",
+        "chain_id": network.chain_id,
+        "network_id": network.id,
+        "claim_boundary": network.claim_boundary,
         "source_verified": False,
     }
     DEPLOYMENTS_FILE.parent.mkdir(parents=True, exist_ok=True)

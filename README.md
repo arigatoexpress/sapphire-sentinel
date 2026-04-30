@@ -163,7 +163,10 @@ and the dashboard:
 - Base Sepolia: local mock x402 gate with `PAYMENT-SIGNATURE` verification,
   quote binding, EIP-712 payer recovery, and nonce replay rejection; next step
   is real testnet facilitator settlement.
-- MegaETH testnet: deploy-ready low-latency receipt mirror.
+- MegaETH testnet: deployed low-latency receipt mirror seeded with the same
+  mandate, approved receipt, and blocked receipt as Robinhood Chain.
+- MegaETH mainnet: live/TGE-aware read-only profile with chain ID `4326`, RPC
+  `https://mainnet.megaeth.com/rpc`, and MEGA token metadata.
 - Zama on Sepolia: local encrypted-risk proof bundle and mock contract, with
   real FHEVM deployment next.
 - Aztec: private mandate / intent proof blueprint with exported commitment

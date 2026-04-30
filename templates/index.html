@@ -254,6 +254,11 @@
       </section>
 
       <section>
+        <h2>Receipt Mirrors</h2>
+        <div class="matrix" id="mirror-list"></div>
+      </section>
+
+      <section>
         <h2>Network Registry</h2>
         <div class="matrix" id="network-list"></div>
       </section>
@@ -487,6 +492,19 @@ function renderRoadmap() {
   `).join('');
 }
 
+function renderMirrors() {
+  document.getElementById('mirror-list').innerHTML = data.receipt_mirrors.map((item) => `
+    <div class="matrix-row">
+      <span>
+        <strong>${escapeHtml(item.name)}</strong>
+        <small>${escapeHtml(item.role)} | ${escapeHtml(item.caip2 || 'non-evm')}</small>
+        <small>${item.contract_address ? linkOrText(item.explorer, item.contract_address) : escapeHtml(item.claim_boundary)}</small>
+      </span>
+      <span class="tag">${escapeHtml(item.status)}</span>
+    </div>
+  `).join('');
+}
+
 async function evaluateResource(overrides = null) {
   const payload = overrides || {
     resource: document.getElementById('eval-resource').value,
@@ -533,6 +551,7 @@ async function load() {
   renderProofPoints();
   renderNetworks();
   renderRoadmap();
+  renderMirrors();
   renderDecision(data.approved_flow);
   evaluateResource();
 }
