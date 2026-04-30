@@ -21,7 +21,7 @@ pretending those systems do the same job.
 | Rail | Ship status | What it proves |
 |---|---|---|
 | Robinhood Chain testnet | Live | Source-verified non-custodial registry with approved and blocked agent receipts |
-| Base Sepolia x402 | Ready next | Real HTTP 402 agent-payment rail using Base Sepolia USDC and a testnet facilitator |
+| Base Sepolia x402 | Local gate shipped | HTTP 402 payment requirement plus mock `PAYMENT-SIGNATURE` verification, quote binding, and replay rejection |
 | MegaETH testnet | Deploy-ready | Low-latency public receipt mirror for pre-action agent controls |
 | Zama on Sepolia | Artifact next | Encrypted budget/risk thresholding can export a commitment to the public receipt |
 | Aztec | Blueprint next | Private mandate or intent evidence can export a public commitment |
@@ -49,13 +49,29 @@ Do not say:
 
 ### 1. Base x402 Rail
 
-The current demo already emits an x402-compatible `402 Payment Required` response
-with Base Sepolia CAIP-2 `eip155:84532` and Base Sepolia USDC
-`0x036CbD53842c5426634e7929541eC2318f3dCF7e`.
+The current demo emits an x402-compatible `402 Payment Required` response with
+Base Sepolia CAIP-2 `eip155:84532` and Base Sepolia USDC
+`0x036CbD53842c5426634e7929541eC2318f3dCF7e`. It also ships a protected
+resource at `/api/x402/sentinel-report` that accepts a mock
+`PAYMENT-SIGNATURE`, verifies quote binding, rejects amount/payee tampering, and
+blocks nonce replay.
+
+Demo commands:
+
+```bash
+HEADER=$(PYTHONPATH=src python scripts/mint_mock_x402_payment.py --header-only)
+curl -H "PAYMENT-SIGNATURE: $HEADER" http://127.0.0.1:8098/api/x402/sentinel-report
+curl -H "PAYMENT-SIGNATURE: $HEADER" http://127.0.0.1:8098/api/x402/sentinel-report
+```
+
+The first call returns `mode=x402_mock_verified`; the second returns a 402 replay
+rejection. This is intentionally a local verifier, not a live facilitator
+settlement.
 
 Next code:
 
-- Add a buyer script that signs a Base Sepolia x402 payload.
+- Replace the mock header generator with a wallet-signed Base Sepolia x402
+  payload.
 - Add an env-gated verifier path for `https://x402.org/facilitator`.
 - Keep `liveSettlementEnabled=false` until a testnet wallet signs the payload.
 - Optionally add CDP facilitator config behind env vars for Base mainnet.
@@ -73,6 +89,11 @@ Next code:
 - Deploy only if the RPC preflight passes and the testnet key has enough gas.
 - Record the MegaETH address under `data/deployments.json` without overwriting
   Robinhood Chain metadata.
+
+Latest preflight note: the public MegaETH RPC reported chain ID `6343`, but the
+current local burner has zero MegaETH testnet ETH. Fund the burner address from
+the MegaETH faucet, then rerun `scripts/deploy_registry.py --network
+megaeth_testnet --check`.
 
 ### 3. Zama Encrypted Risk Gate
 

@@ -569,6 +569,11 @@ def build_proof_points() -> list[dict[str, str]]:
             "evidence": (demo_events.get("blocked_receipt") or {}).get("explorer", ""),
         },
         {
+            "label": "x402 protected report",
+            "status": "mock-verified",
+            "evidence": "/api/x402/sentinel-report",
+        },
+        {
             "label": "Live order path",
             "status": "disabled",
             "evidence": "testnet_paper_only",

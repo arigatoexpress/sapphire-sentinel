@@ -22,10 +22,11 @@ injections, or turn a data request into an execution request. Sapphire Sentinel
 is the missing control plane.
 
 The demo models an x402 paid-data flow. An agent requests a private RWA signal,
-Sentinel binds the quote, checks the domain, action, budget, payment amount,
-prompt-injection language, secret-egress risk, and contract-level receipt
-replay protection, then produces either an approved payment preview or a
-blocked receipt. The resulting
+Sentinel returns a Base Sepolia x402 payment requirement, accepts a mock
+`PAYMENT-SIGNATURE` for the protected report endpoint, binds the quote, checks
+the domain, action, budget, payment amount, prompt-injection language,
+secret-egress risk, and nonce replay protection, then produces either an
+approved payment preview or a blocked receipt. The resulting
 commitments are anchored in `SapphireSentinelRegistry`, a non-custodial
 contract deployed and source-verified on Robinhood Chain testnet. The demo
 includes both an approved payment receipt and a blocked prompt-injection
@@ -66,10 +67,13 @@ Best Agentic Project and Robinhood Chain reserved prize.
 
 - Open dashboard.
 - Show approved x402 quote for private RWA signal.
+- Run `scripts/mint_mock_x402_payment.py --header-only`, call
+  `/api/x402/sentinel-report`, then replay the same header to show a 402 nonce
+  rejection.
 - Click prompt-injection scenario and show the blocked receipt.
 - Show privacy sidecar commitments.
-- Show the network registry: Robinhood live, Base x402 next, MegaETH deploy-ready,
-  Zama/Aztec sidecar artifacts.
+- Show the network registry: Robinhood live, Base local x402 gate shipped,
+  MegaETH deploy-ready, Zama/Aztec sidecar artifacts.
 - Show deployed and source-verified Robinhood Chain anchor.
 - Close on the judge scorecard.
 

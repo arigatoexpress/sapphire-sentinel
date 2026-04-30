@@ -63,9 +63,9 @@ NETWORKS: tuple[NetworkProfile, ...] = (
         caip2="eip155:84532",
         rpc="https://sepolia.base.org",
         explorer="https://sepolia.basescan.org",
-        status="ready_for_x402_testnet",
-        next_action="Add a real x402 protected resource using Base Sepolia USDC and x402.org facilitator.",
-        claim_boundary="Use testnet facilitator by default; production CDP facilitator requires API keys.",
+        status="mock_x402_gate_live",
+        next_action="Replace the local mock header with wallet-signed Base Sepolia USDC and facilitator verification.",
+        claim_boundary="Local verifier only today; no facilitator settlement or production CDP call by default.",
         source="https://docs.x402.org/core-concepts/network-and-token-support",
     ),
     NetworkProfile(
@@ -120,10 +120,10 @@ INTEGRATION_PHASES: tuple[IntegrationPhase, ...] = (
     ),
     IntegrationPhase(
         label="2. Base x402 Rail",
-        status="next",
-        proof="Current 402 response already uses Base Sepolia CAIP-2 and USDC asset metadata.",
-        implementation="Add buyer/server scripts for x402.org facilitator on Base Sepolia and keep live mode env-gated.",
-        boundary="Default dashboard remains simulation until a testnet wallet signs an x402 payload.",
+        status="local_shipped",
+        proof="Protected report endpoint verifies a mock PAYMENT-SIGNATURE, quote binding, and nonce replay.",
+        implementation="Upgrade mock headers to wallet-signed Base Sepolia x402 payloads behind an env-gated facilitator verifier.",
+        boundary="Default dashboard remains non-settling until a testnet wallet signs an x402 payload.",
     ),
     IntegrationPhase(
         label="3. Zama Risk Gate",

@@ -13,9 +13,14 @@ from sapphire_sentinel.sentinel import (
     evaluate_attempt,
     evaluate_from_payload,
 )
-from sapphire_sentinel.x402 import encode_payment_required
+from sapphire_sentinel.x402 import (
+    build_402_response,
+    encode_payment_required,
+    verify_mock_payment_header,
+)
 
 app = Flask(__name__, template_folder="../../templates")
+_X402_NONCES: set[str] = set()
 
 
 @app.get("/")
@@ -69,12 +74,42 @@ def api_judging():
 @app.get("/api/x402/paywall")
 def api_x402_paywall():
     decision = evaluate_attempt(default_attempt())
-    payment_required = decision.http_402
-    response = make_response(jsonify(payment_required), 402)
-    response.headers["PAYMENT-REQUIRED"] = encode_payment_required(payment_required)
-    response.headers["X-Sentinel-Mode"] = "simulation"
-    response.headers["X-Sentinel-Receipt"] = decision.receipt_id
-    return response
+    return _payment_required_response(decision)
+
+
+@app.get("/api/x402/sentinel-report")
+def api_x402_sentinel_report():
+    decision = evaluate_attempt(default_attempt())
+    payment_header = request.headers.get("PAYMENT-SIGNATURE") or request.headers.get("X-PAYMENT")
+    if not payment_header:
+        return _payment_required_response(decision, error="PAYMENT-SIGNATURE header is required")
+
+    verification = verify_mock_payment_header(
+        payment_header,
+        decision.payment_requirements,
+        nonce_cache=_X402_NONCES,
+    )
+    if not verification.valid:
+        return _payment_required_response(decision, error=verification.error or "payment rejected")
+
+    return jsonify(
+        {
+            "paid": True,
+            "mode": "x402_mock_verified",
+            "liveSettlementEnabled": False,
+            "verification": verification.to_wire(),
+            "report": {
+                "title": "Sapphire Sentinel Private RWA Signal",
+                "summary": default_attempt().result_summary,
+                "resource": default_attempt().resource,
+                "privacy_commitment": decision.privacy_commitment,
+                "receipt_id": decision.receipt_id,
+                "risk_hash": decision.risk_hash,
+                "order_draft": decision.order_draft["primary_draft"],
+            },
+            "decision": decision.to_dict(),
+        }
+    )
 
 
 @app.post("/api/evaluate")
@@ -87,6 +122,18 @@ def api_evaluate():
             "decision": evaluate_from_payload(payload),
         }
     )
+
+
+def _payment_required_response(decision, *, error: str | None = None):
+    payment_required = (
+        build_402_response([decision.payment_requirements], error=error) if error else decision.http_402
+    )
+    response = make_response(jsonify(payment_required), 402)
+    response.headers["PAYMENT-REQUIRED"] = encode_payment_required(payment_required)
+    response.headers["X-Sentinel-Mode"] = "simulation"
+    response.headers["X-Sentinel-Receipt"] = decision.receipt_id
+    response.headers["X-Sentinel-Payment-Status"] = "required" if not error else "rejected"
+    return response
 
 
 if __name__ == "__main__":

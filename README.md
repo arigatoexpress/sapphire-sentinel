@@ -16,6 +16,7 @@ The short version: agents can hit paid APIs through an x402-style flow, but Sent
 | Privacy sidecar commitments | `src/sapphire_sentinel/privacy.py` |
 | Red-team scenarios | `src/sapphire_sentinel/scenarios.py` |
 | Flask demo app | `src/sapphire_sentinel/app.py` |
+| Mock x402 buyer header | `scripts/mint_mock_x402_payment.py` |
 | Robinhood Chain deploy helper | `scripts/deploy_robinhood_chain.py` |
 | Buildathon plan | `docs/london-buildathon-plan.md` |
 | Research brief | `docs/research.md` |
@@ -58,6 +59,18 @@ Backup CLI:
 PYTHONPATH=src python scripts/run_demo.py
 ```
 
+Protected x402 report demo:
+
+```bash
+HEADER=$(PYTHONPATH=src python scripts/mint_mock_x402_payment.py --header-only)
+curl -H "PAYMENT-SIGNATURE: $HEADER" http://127.0.0.1:8098/api/x402/sentinel-report
+curl -H "PAYMENT-SIGNATURE: $HEADER" http://127.0.0.1:8098/api/x402/sentinel-report
+```
+
+The first call returns the private-signal report in `x402_mock_verified` mode.
+The second call is rejected for nonce replay. No facilitator or live settlement
+is invoked.
+
 ## Verify
 
 ```bash
@@ -78,6 +91,7 @@ python scripts/deploy_registry.py --network megaeth_testnet --dry-run
 | `GET /api/scenarios` | Red-team matrix and pass/fail outcomes |
 | `GET /api/privacy` | Oasis/Zama/Aztec sidecar commitments and constraints |
 | `GET /api/x402/paywall` | Simulated x402 v2 `402 Payment Required` with `PAYMENT-REQUIRED` header |
+| `GET /api/x402/sentinel-report` | Protected report unlocked by a bound mock `PAYMENT-SIGNATURE` header |
 | `POST /api/evaluate` | Evaluate an arbitrary paid-resource attempt |
 
 ## Demo Flow
@@ -127,7 +141,9 @@ Sentinel now exposes a network registry and integration roadmap in `/api/network
 and the dashboard:
 
 - Robinhood Chain testnet: live RWA audit anchor.
-- Base Sepolia: next real x402 payment rail.
+- Base Sepolia: local mock x402 gate with `PAYMENT-SIGNATURE` verification,
+  quote binding, and nonce replay rejection; next step is real wallet-signed
+  testnet settlement.
 - MegaETH testnet: deploy-ready low-latency receipt mirror.
 - Zama on Sepolia: encrypted budget/risk gate artifact path.
 - Aztec: private mandate / intent proof blueprint.

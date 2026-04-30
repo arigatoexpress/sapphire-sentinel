@@ -31,11 +31,13 @@ receipt hash is anchored on-chain.
 2. Agent requests a paid private RWA signal.
 3. The API returns an x402 v2-compatible payment requirement on Base Sepolia
    using CAIP-2 network ID `eip155:84532`.
-4. Sentinel screens the request. A safe request is approved; an untrusted or
+4. The protected report endpoint verifies a mock `PAYMENT-SIGNATURE`, rejects
+   replayed nonces, and keeps live facilitator settlement disabled.
+5. Sentinel screens the request. A safe request is approved; an untrusted or
    prompt-injected request is blocked.
-5. Approved flow returns a dry-run Robinhood order draft and a recorded
+6. Approved flow returns a dry-run Robinhood order draft and a recorded
    Robinhood Chain receipt for `SapphireSentinelRegistry.recordPaymentEvaluation(...)`.
-6. Dashboard shows the same decision as a judge-friendly chain/payment/privacy
+7. Dashboard shows the same decision as a judge-friendly chain/payment/privacy
    trace in the standalone app.
 
 ## Build Surface
@@ -47,7 +49,7 @@ receipt hash is anchored on-chain.
 | Privacy commitments | `src/sapphire_sentinel/privacy.py` |
 | Red-team scenarios | `src/sapphire_sentinel/scenarios.py` |
 | Dashboard page | `templates/index.html` |
-| Demo APIs | `/api/demo`, `/api/evaluate`, `/api/x402/paywall` |
+| Demo APIs | `/api/demo`, `/api/evaluate`, `/api/x402/paywall`, `/api/x402/sentinel-report` |
 | Deployment list | `scripts/deploy_robinhood_chain.py` |
 
 ## Safe Defaults
