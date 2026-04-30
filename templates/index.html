@@ -135,6 +135,20 @@
     .privacy-row { border: 1px solid #2b4052; border-radius: 8px; padding: 10px; background: var(--panel-2); }
     .privacy-row strong { display: block; color: #dbe8f3; margin-bottom: 5px; font-size: 13px; }
     .privacy-row span { display: block; color: var(--muted); font-size: 12px; line-height: 1.4; overflow-wrap: anywhere; }
+    .matrix { display: grid; gap: 8px; }
+    .matrix-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: start;
+      border: 1px solid #2b4052;
+      border-radius: 8px;
+      padding: 10px;
+      background: var(--panel-2);
+    }
+    .matrix-row strong { display: block; color: #dbe8f3; font-size: 13px; margin-bottom: 4px; }
+    .matrix-row small { display: block; color: var(--muted); font-size: 12px; line-height: 1.35; }
+    .matrix-row .tag { color: #071214; background: var(--blue); border-radius: 999px; padding: 4px 8px; font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; white-space: nowrap; }
     @media (max-width: 1120px) {
       .layout { grid-template-columns: 1fr 1fr; }
       .side { grid-column: 1 / -1; }
@@ -238,6 +252,11 @@
           <div class="row"><span>blocked</span><span id="event-blocked"></span></div>
         </div>
       </section>
+
+      <section>
+        <h2>Network Registry</h2>
+        <div class="matrix" id="network-list"></div>
+      </section>
     </div>
 
     <div class="side">
@@ -249,6 +268,11 @@
       <section>
         <h2>Proof Points</h2>
         <div class="proof" id="proof-list"></div>
+      </section>
+
+      <section>
+        <h2>Integration Roadmap</h2>
+        <div class="matrix" id="roadmap-list"></div>
       </section>
 
       <section>
@@ -419,6 +443,32 @@ function renderProofPoints() {
   `).join('');
 }
 
+function renderNetworks() {
+  document.getElementById('network-list').innerHTML = data.network_matrix.map((item) => `
+    <div class="matrix-row">
+      <span>
+        <strong>${escapeHtml(item.name)}</strong>
+        <small>${escapeHtml(item.role)} | ${escapeHtml(item.caip2 || 'non-evm/private')}</small>
+        <small>${escapeHtml(item.next_action)}</small>
+      </span>
+      <span class="tag">${escapeHtml(item.status)}</span>
+    </div>
+  `).join('');
+}
+
+function renderRoadmap() {
+  document.getElementById('roadmap-list').innerHTML = data.integration_roadmap.map((item) => `
+    <div class="matrix-row">
+      <span>
+        <strong>${escapeHtml(item.label)}</strong>
+        <small>${escapeHtml(item.proof)}</small>
+        <small>${escapeHtml(item.boundary)}</small>
+      </span>
+      <span class="tag">${escapeHtml(item.status)}</span>
+    </div>
+  `).join('');
+}
+
 async function evaluateResource(overrides = null) {
   const payload = overrides || {
     resource: document.getElementById('eval-resource').value,
@@ -462,6 +512,8 @@ async function load() {
   renderPrivacy();
   renderScorecard();
   renderProofPoints();
+  renderNetworks();
+  renderRoadmap();
   renderDecision(data.approved_flow);
   evaluateResource();
 }

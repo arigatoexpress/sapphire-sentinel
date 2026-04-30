@@ -55,4 +55,5 @@ def test_supporting_endpoints_are_present():
     assert client.get("/api/health").status_code == 200
     assert len(client.get("/api/scenarios").get_json()) >= 5
     assert len(client.get("/api/privacy").get_json()) == 3
+    assert len(client.get("/api/networks").get_json()["networks"]) >= 5
     assert len(client.get("/api/judging").get_json()) == 4

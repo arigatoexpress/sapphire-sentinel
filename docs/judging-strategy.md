@@ -20,13 +20,15 @@ testnet, and addresses a real operational gap in tokenized finance.
 |---|---|
 | Smart contract quality | Non-custodial registry, mandate expiry, budget accounting, receipt replay protection, two-step operator transfer, no value-moving paths |
 | Product-market fit | Financial institutions and users need bounded autonomous agents before tokenized RWA markets can be trusted |
-| Innovation and creativity | x402 agent payments plus privacy sidecars plus Robinhood Chain audit anchors |
+| Innovation and creativity | x402 agent payments plus Zama/Aztec privacy sidecars plus Robinhood and MegaETH receipt anchors |
 | Real problem solving | Blocks prompt injection, secret egress, untrusted providers, wrong actions, overspend, and replay-prone payment attempts |
 
 ## What Judges Should Remember
 
 - It uses Robinhood Chain for the part that matters: public attestations for
   autonomous RWA controls.
+- It shows the expansion path: Base for real x402, MegaETH for fast receipts,
+  Zama for encrypted risk, and Aztec for private intent evidence.
 - It does not pretend the testnet stock tokens have real value.
 - It does not pretend Robinhood Chain is private.
 - It shows a security product with clear users: agent builders, RWA protocols,

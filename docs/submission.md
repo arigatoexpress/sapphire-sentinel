@@ -35,7 +35,8 @@ without writing raw prompts, private risk data, or secrets to chain.
 Robinhood Chain remains the public audit rail. Sensitive policy inputs stay
 off-chain or inside privacy sidecars. Oasis Sapphire is the first confidential
 policy target, while Zama fhEVM and Aztec are companion artifacts for encrypted
-risk math and private intent evidence.
+risk math and private intent evidence. Base Sepolia is the immediate x402
+settlement target, and MegaETH testnet is the deploy-ready receipt mirror.
 
 This is not another AI trader. It is safety infrastructure for the agents that
 tokenized finance will need before real users, institutions, and data providers
@@ -67,6 +68,8 @@ Best Agentic Project and Robinhood Chain reserved prize.
 - Show approved x402 quote for private RWA signal.
 - Click prompt-injection scenario and show the blocked receipt.
 - Show privacy sidecar commitments.
+- Show the network registry: Robinhood live, Base x402 next, MegaETH deploy-ready,
+  Zama/Aztec sidecar artifacts.
 - Show deployed and source-verified Robinhood Chain anchor.
 - Close on the judge scorecard.
 
@@ -75,5 +78,6 @@ Best Agentic Project and Robinhood Chain reserved prize.
 - Repository: `https://github.com/arigatoexpress/sapphire-sentinel`
 - Explorer: `https://explorer.testnet.chain.robinhood.com/address/0x2EBB91F7B376cB821d90ac4A7d77B0d06b70B36F`
 - Privacy claims: `docs/privacy-claims.md`
+- Cross-chain roadmap: `docs/integration-roadmap.md`
 - Demo video: pending final recording
 - Live demo URL: local during judging, `http://127.0.0.1:8098`

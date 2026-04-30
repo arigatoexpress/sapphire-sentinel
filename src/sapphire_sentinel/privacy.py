@@ -85,7 +85,7 @@ def build_privacy_attestations(
             public_outputs=("risk_hash", "privacy_commitment"),
             commitment=zama_commitment,
             status="companion artifact; not claimed as native Robinhood Chain FHE",
-            implementation_path="FHELimitDemo.sol using encrypted Solidity types",
+            implementation_path="contracts/privacy/EncryptedRiskGateMock.sol, then Zama FHEVM Sepolia port",
             constraints=(
                 "requires Zama protocol host/gateway/coprocessor support",
                 "do not claim private Robinhood Chain payments",
@@ -100,7 +100,7 @@ def build_privacy_attestations(
             public_outputs=("resource_hash", "result_hash", "privacy_commitment"),
             commitment=aztec_commitment,
             status="local/private-intent blueprint",
-            implementation_path="Aztec local network note demo plus Robinhood receipt commitment",
+            implementation_path="artifacts/privacy/aztec_private_intent_note.nr",
             constraints=(
                 "Aztec is not EVM-compatible",
                 "Ethereum/Aztec messaging is asynchronous and explicit",

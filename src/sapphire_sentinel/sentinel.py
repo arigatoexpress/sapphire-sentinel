@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
+from sapphire_sentinel.networks import build_integration_roadmap, build_network_matrix
 from sapphire_sentinel.privacy import build_privacy_attestations, primary_privacy_commitment
 from sapphire_sentinel.x402 import (
     DEFAULT_USDC_CONTRACTS,
@@ -458,6 +459,8 @@ def build_demo_state() -> dict[str, Any]:
                 resource_hash=approved.resource_hash,
             )
         ],
+        "network_matrix": build_network_matrix(),
+        "integration_roadmap": build_integration_roadmap(),
         "attack_scenarios": _scenario_matrix(),
         "judging_scorecard": build_judging_scorecard(),
         "proof_points": build_proof_points(),

@@ -32,8 +32,8 @@ payments, private Robinhood stock-token transfers, or production compliance.
 | Layer | Role | Status |
 |---|---|---|
 | Oasis Sapphire | Confidential policy and risk sidecar that can produce signed allow/deny commitments | Demo-ready commitment preview |
-| Zama fhEVM | Encrypted budget and risk-score math with Solidity encrypted types | Companion artifact, not native Robinhood support |
-| Aztec | Private intent or balance evidence exported as a commitment | Local/private-intent blueprint |
+| Zama fhEVM | Encrypted budget and risk-score math with Solidity encrypted types | Local mock artifact plus Sepolia deployment path, not native Robinhood support |
+| Aztec | Private intent or balance evidence exported as a commitment | Noir private-intent blueprint |
 
 ## Demo Boundary
 

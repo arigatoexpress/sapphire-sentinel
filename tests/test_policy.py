@@ -75,6 +75,8 @@ def test_demo_state_is_safe_by_default():
     assert state["blocked_flow"]["chain_anchor"]["onchain_recorded"] is True
     assert len(state["attack_scenarios"]) >= 5
     assert len(state["privacy_attestations"]) == 3
+    assert len(state["network_matrix"]) >= 5
+    assert len(state["integration_roadmap"]) == 4
     assert len(state["judging_scorecard"]) == 4
     assert len(state["proof_points"]) == 4
     assert state["safety"]["live_trading_enabled"] is False

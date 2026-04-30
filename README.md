@@ -20,6 +20,7 @@ The short version: agents can hit paid APIs through an x402-style flow, but Sent
 | Buildathon plan | `docs/london-buildathon-plan.md` |
 | Research brief | `docs/research.md` |
 | Privacy claims | `docs/privacy-claims.md` |
+| Cross-chain/privacy roadmap | `docs/integration-roadmap.md` |
 | Demo script | `docs/demo-script.md` |
 
 ## Safety Defaults
@@ -63,6 +64,8 @@ PYTHONPATH=src python scripts/run_demo.py
 pytest -q
 ruff check .
 python scripts/deploy_robinhood_chain.py --dry-run
+python scripts/probe_networks.py
+python scripts/deploy_registry.py --network megaeth_testnet --dry-run
 ```
 
 `--dry-run` compiles the contract and skips deployment. Full deployment requires a funded Robinhood Chain testnet key in `ROBINHOOD_DEPLOY_KEY`.
@@ -117,3 +120,17 @@ The deployment used a burner EVM account funded only with Robinhood Chain testne
 - Approved receipt: `0xc522c1d31f632662e8a7921a50e0b8827eabc7f5ffd88e3ca489a4e4399d25d8`
 - Blocked receipt: `0x0d7d1708b80cc14975564dd96c64d7ed37a5ee7dc5ac484929d5ae4bca7c7390`
 - On-chain remaining demo budget: `1.618` USDC (`1,618,000` atomic units).
+
+## Cross-Chain Roadmap
+
+Sentinel now exposes a network registry and integration roadmap in `/api/networks`
+and the dashboard:
+
+- Robinhood Chain testnet: live RWA audit anchor.
+- Base Sepolia: next real x402 payment rail.
+- MegaETH testnet: deploy-ready low-latency receipt mirror.
+- Zama on Sepolia: encrypted budget/risk gate artifact path.
+- Aztec: private mandate / intent proof blueprint.
+
+The public claim stays tight: privacy sidecars export commitments to public
+receipts; they are not private Robinhood Chain payments.

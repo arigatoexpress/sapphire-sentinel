@@ -20,6 +20,8 @@ flowchart LR
     Sentinel --> Registry["SapphireSentinelRegistry"]
     Block --> Registry
     Registry --> Explorer["Robinhood Chain Testnet Explorer"]
+    Sentinel --> Base["Base Sepolia x402 Rail"]
+    Registry --> MegaETH["MegaETH Receipt Mirror"]
 ```
 
 ## Runtime Surfaces
@@ -29,6 +31,7 @@ flowchart LR
 | Flask demo | Judge-facing control surface and API |
 | Policy engine | Checks domain, action, amount, budget, prompt-injection, secret-egress, nonce, and privacy commitments |
 | x402 model | Simulates v2 payment quote and `PAYMENT-REQUIRED` header shape |
+| Network registry | Labels Robinhood, Base, MegaETH, Zama, and Aztec roles without over-claiming |
 | Privacy module | Produces labeled Oasis Sapphire, Zama fhEVM, and Aztec commitments |
 | Contract | Records mandates and payment evaluations on Robinhood Chain testnet |
 
@@ -40,6 +43,13 @@ testnet.
 - Address: `0x2EBB91F7B376cB821d90ac4A7d77B0d06b70B36F`
 - Transaction: `0xc53ab8fc8cdab4ce7ef5f09fd56fc564756fd8d5e5b7c0396238878d6cc84975`
 - Explorer: `https://explorer.testnet.chain.robinhood.com/address/0x2EBB91F7B376cB821d90ac4A7d77B0d06b70B36F`
+
+`scripts/deploy_registry.py` can compile the same registry for other configured
+EVM testnets, starting with MegaETH testnet:
+
+```bash
+python scripts/deploy_registry.py --network megaeth_testnet --dry-run
+```
 
 ## Safety Boundary
 

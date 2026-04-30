@@ -50,6 +50,17 @@ def api_privacy():
     return jsonify(build_demo_state()["privacy_attestations"])
 
 
+@app.get("/api/networks")
+def api_networks():
+    state = build_demo_state()
+    return jsonify(
+        {
+            "networks": state["network_matrix"],
+            "integration_roadmap": state["integration_roadmap"],
+        }
+    )
+
+
 @app.get("/api/judging")
 def api_judging():
     return jsonify(build_judging_scorecard())

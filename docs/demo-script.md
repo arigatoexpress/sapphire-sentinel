@@ -32,13 +32,14 @@ Point out:
 
 ## 50-70 Seconds
 
-Show Privacy Sidecars and On-Chain Event Proofs.
+Show Privacy Sidecars, Network Registry, and On-Chain Event Proofs.
 
 Pitch:
 
 > Robinhood Chain stays public. Sensitive policy inputs stay in privacy sidecars.
 > Oasis Sapphire is the first real implementation target; Zama and Aztec are
-> companion artifacts for encrypted risk math and private intent evidence.
+> companion artifacts for encrypted risk math and private intent evidence. Base
+> gives us the x402 rail, and MegaETH is the low-latency receipt mirror.
 
 ## 70-90 Seconds
 
