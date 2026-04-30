@@ -16,14 +16,23 @@ from decimal import ROUND_HALF_UP, Decimal
 from typing import Any
 from urllib.parse import urlparse
 
-from sapphire_sentinel.x402 import DEFAULT_USDC_CONTRACTS, PaymentRequirements
+from sapphire_sentinel.privacy import build_privacy_attestations, primary_privacy_commitment
+from sapphire_sentinel.x402 import (
+    DEFAULT_USDC_CONTRACTS,
+    PaymentRequirements,
+    build_402_response,
+    build_mock_payment_payload,
+)
 
 ROBINHOOD_CHAIN_ID = 46630
 ROBINHOOD_EXPLORER = "https://explorer.testnet.chain.robinhood.com"
 ROBINHOOD_RPC = "https://rpc.testnet.chain.robinhood.com"
 X402_SETTLEMENT_NETWORK = "base-sepolia"
-X402_USDC_ASSET = DEFAULT_USDC_CONTRACTS[X402_SETTLEMENT_NETWORK]
+X402_CAIP2_NETWORK = "eip155:84532"
+X402_USDC_ASSET = DEFAULT_USDC_CONTRACTS[X402_CAIP2_NETWORK]
 USDC_DECIMALS = Decimal("1000000")
+USDG_CONTRACT = "0x7E955252E15c84f5768B83c41a71F9eba181802F"
+WETH_CONTRACT = "0x7943e237c7F95DA44E0301572D358911207852Fa"
 
 ROBINHOOD_STOCK_TOKENS = {
     "TSLA": "0xC9f9c86933092BbbfFF3CCb4b105A4A94bf3Bd4E",
@@ -119,7 +128,11 @@ class SentinelDecision:
     resource_hash: str
     result_hash: str
     risk_hash: str
+    privacy_commitment: str
+    decision_nonce: int
     payment_requirements: PaymentRequirements
+    http_402: dict[str, Any]
+    payment_payload_preview: dict[str, Any]
     chain_anchor: dict[str, Any]
     order_draft: dict[str, Any]
 
@@ -127,6 +140,7 @@ class SentinelDecision:
         data = asdict(self)
         data["spend_remaining_usdc"] = _money(self.spend_remaining_usdc)
         data["payment_requirements"] = self.payment_requirements.to_wire()
+        data["decision_nonce"] = str(self.decision_nonce)
         return data
 
 
@@ -235,11 +249,28 @@ def evaluate_attempt(
         }
     )
     policy_hash = active_mandate.policy_hash()
+    privacy_commitment = primary_privacy_commitment(
+        policy_hash=policy_hash,
+        result_hash=result_hash,
+        risk_hash=risk_hash,
+        resource_hash=resource_hash,
+    )
+    decision_nonce = int(
+        _hash_payload(
+            {
+                "mandate_id": active_mandate.mandate_id,
+                "resource_hash": resource_hash,
+                "amount_atomic": attempt.amount_atomic,
+                "risk_hash": risk_hash,
+            }
+        )[2:18],
+        16,
+    )
 
     requirements = PaymentRequirements(
         scheme="exact",
-        network=X402_SETTLEMENT_NETWORK,
-        max_amount_required=str(attempt.amount_atomic),
+        network=X402_CAIP2_NETWORK,
+        amount=str(attempt.amount_atomic),
         resource=attempt.resource,
         description="Sapphire Sentinel private RWA signal",
         mime_type="application/json",
@@ -250,7 +281,13 @@ def evaluate_attempt(
             "robinhoodChainId": ROBINHOOD_CHAIN_ID,
             "mandateId": active_mandate.mandate_id,
             "receiptHash": receipt_id,
+            "privacyCommitment": privacy_commitment,
         },
+    )
+    http_402 = build_402_response([requirements])
+    payment_payload_preview = build_mock_payment_payload(
+        requirements,
+        from_address=active_mandate.agent,
     )
 
     spend_remaining = active_mandate.remaining_usdc
@@ -269,7 +306,11 @@ def evaluate_attempt(
         resource_hash=resource_hash,
         result_hash=result_hash,
         risk_hash=risk_hash,
+        privacy_commitment=privacy_commitment,
+        decision_nonce=decision_nonce,
         payment_requirements=requirements,
+        http_402=http_402,
+        payment_payload_preview=payment_payload_preview,
         chain_anchor={
             "contract": "SapphireSentinelRegistry",
             "chain": "robinhood_testnet",
@@ -281,9 +322,26 @@ def evaluate_attempt(
             "resource_hash": resource_hash,
             "result_hash": result_hash,
             "risk_hash": risk_hash,
+            "privacy_commitment": privacy_commitment,
+            "decision_nonce": str(decision_nonce),
             "approved": approved,
             "broadcast": False,
             "mode": "dry_run_anchor_preview",
+            "record_call": {
+                "method": "recordPaymentEvaluation",
+                "args": [
+                    receipt_id,
+                    active_mandate.mandate_id,
+                    active_mandate.agent,
+                    str(attempt.amount_atomic),
+                    resource_hash,
+                    result_hash,
+                    risk_hash,
+                    privacy_commitment,
+                    str(decision_nonce),
+                    approved,
+                ],
+            },
         },
         order_draft=build_order_draft(order_symbol, order_action, notional_usd),
     )
@@ -344,13 +402,18 @@ def build_demo_state() -> dict[str, Any]:
     return {
         "project": {
             "name": "Sapphire Sentinel",
-            "tagline": "Policy, privacy, and payment safety for autonomous RWA agents.",
+            "tagline": "The agent firewall for tokenized RWA finance.",
             "hackathon": "Arbitrum Open House London 2026",
             "primary_chain": "Robinhood Chain Testnet",
             "chain_id": ROBINHOOD_CHAIN_ID,
-            "settlement_network": X402_SETTLEMENT_NETWORK,
+            "settlement_network": X402_CAIP2_NETWORK,
             "mode": "testnet_paper_only",
+            "thesis": (
+                "Autonomous agents should be able to buy useful data, but only inside "
+                "human mandates, privacy commitments, and auditable on-chain guardrails."
+            ),
         },
+        "chain_config": build_chain_config(),
         "mandate": {
             **mandate.policy_payload(),
             "spent_usdc": _money(mandate.spent_usdc),
@@ -359,12 +422,17 @@ def build_demo_state() -> dict[str, Any]:
         },
         "approved_flow": approved.to_dict(),
         "blocked_flow": blocked.to_dict(),
-        "privacy_attestation": {
-            "engine": "zama-fhevm-sidecar-or-local-mock",
-            "public_claim": "basket risk passes issuer concentration and drawdown caps",
-            "private_inputs": ("exact holdings", "risk weights", "raw threat scores"),
-            "published_fields": ("result_hash", "risk_hash", "policy_hash"),
-        },
+        "privacy_attestations": [
+            item.to_dict()
+            for item in build_privacy_attestations(
+                policy_hash=approved.policy_hash,
+                result_hash=approved.result_hash,
+                risk_hash=approved.risk_hash,
+                resource_hash=approved.resource_hash,
+            )
+        ],
+        "attack_scenarios": _scenario_matrix(),
+        "judging_scorecard": build_judging_scorecard(),
         "safety": {
             "live_trading_enabled": False,
             "telegram_sends_enabled": False,
@@ -380,9 +448,11 @@ def build_demo_state() -> dict[str, Any]:
 
 
 def evaluate_from_payload(payload: dict[str, Any]) -> dict[str, Any]:
+    amount = _decimal_from_payload(payload.get("amount_usdc", "0.012"), Decimal("0.012"))
+    notional = float(_decimal_from_payload(payload.get("notional_usd", "25.0"), Decimal("25.0")))
     attempt = PaymentAttempt(
         resource=str(payload.get("resource") or default_attempt().resource),
-        amount_usdc=Decimal(str(payload.get("amount_usdc", "0.012"))),
+        amount_usdc=amount,
         action=str(payload.get("action") or "buy-private-signal"),
         method=str(payload.get("method") or "GET").upper(),
         payload_summary=str(payload.get("payload_summary") or ""),
@@ -392,8 +462,58 @@ def evaluate_from_payload(payload: dict[str, Any]) -> dict[str, Any]:
         attempt,
         order_symbol=str(payload.get("order_symbol") or "PLTR"),
         order_action=str(payload.get("order_action") or "buy"),
-        notional_usd=float(payload.get("notional_usd") or 25.0),
+        notional_usd=notional,
     ).to_dict()
+
+
+def build_chain_config() -> dict[str, Any]:
+    return {
+        "network": "Robinhood Chain Testnet",
+        "chain_id": ROBINHOOD_CHAIN_ID,
+        "rpc": ROBINHOOD_RPC,
+        "explorer": ROBINHOOD_EXPLORER,
+        "alchemy_rpc_template": "https://robinhood-testnet.g.alchemy.com/v2/<YOUR_API_KEY>",
+        "native_gas": "ETH",
+        "tokens": {
+            "WETH": WETH_CONTRACT,
+            "USDG": USDG_CONTRACT,
+            **ROBINHOOD_STOCK_TOKENS,
+        },
+        "terms": "testnet tokens have no monetary value and may be reset",
+    }
+
+
+def build_judging_scorecard() -> list[dict[str, str]]:
+    return [
+        {
+            "criterion": "Smart contract quality",
+            "evidence": (
+                "Non-custodial mandate registry with budget accounting, expiry, nonce replay "
+                "defense, two-step operator transfer, and static tests."
+            ),
+        },
+        {
+            "criterion": "Product-market fit",
+            "evidence": (
+                "Targets the missing operational control layer for tokenized RWA agents: "
+                "payment authorization, privacy commitments, and audit receipts."
+            ),
+        },
+        {
+            "criterion": "Innovation and creativity",
+            "evidence": (
+                "Combines x402 agent payments, Robinhood Chain receipt anchors, and privacy "
+                "sidecars from Oasis Sapphire, Zama, and Aztec without claiming impossible privacy."
+            ),
+        },
+        {
+            "criterion": "Real problem solving",
+            "evidence": (
+                "Blocks prompt injection, secret egress, untrusted providers, wrong actions, "
+                "overspend, and replay-prone payment attempts before an agent can sign."
+            ),
+        },
+    ]
 
 
 def _hash_payload(payload: dict[str, Any]) -> str:
@@ -403,6 +523,19 @@ def _hash_payload(payload: dict[str, Any]) -> str:
 
 def _money(value: Decimal) -> str:
     return str(value.quantize(Decimal("0.000001"), rounding=ROUND_HALF_UP).normalize())
+
+
+def _decimal_from_payload(value: Any, fallback: Decimal) -> Decimal:
+    try:
+        return Decimal(str(value))
+    except Exception:
+        return fallback
+
+
+def _scenario_matrix() -> list[dict[str, Any]]:
+    from sapphire_sentinel.scenarios import build_scenario_matrix
+
+    return build_scenario_matrix()
 
 
 def _reason_for_flag(flag: str) -> str:
@@ -415,4 +548,3 @@ def _reason_for_flag(flag: str) -> str:
         "secret_egress_risk": "payload appears to request or expose secret material",
         "prompt_injection": "payload contains prompt-injection language",
     }.get(flag, flag.replace("_", " "))
-

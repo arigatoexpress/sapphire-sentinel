@@ -1,0 +1,57 @@
+# 90-Second Demo Script
+
+## 0-10 Seconds
+
+Open the dashboard.
+
+Pitch:
+
+> Sapphire Sentinel is the agent firewall for tokenized RWA finance. Agents can
+> buy paid data, but only inside human mandates, privacy commitments, and
+> Robinhood Chain audit receipts.
+
+## 10-30 Seconds
+
+Show the approved scenario.
+
+Point out:
+
+- Human mandate has an allow-list, action list, expiry, and USDC budget.
+- The quote is modeled as x402 v2 on Base Sepolia.
+- The RWA action is a Robinhood Chain test stock-token draft, not a live order.
+
+## 30-50 Seconds
+
+Click the prompt-injection or untrusted-domain scenario.
+
+Point out:
+
+- The same agent is blocked before wallet signing.
+- The receipt still has a risk hash and nonce, so blocked attempts can be audited.
+- No secret or prompt content is written to chain.
+
+## 50-70 Seconds
+
+Show the privacy sidecars.
+
+Pitch:
+
+> Robinhood Chain stays public. Sensitive policy inputs stay in privacy sidecars.
+> Oasis Sapphire is the first real implementation target; Zama and Aztec are
+> companion artifacts for encrypted risk math and private intent evidence.
+
+## 70-90 Seconds
+
+Show the judge scorecard and contract anchor.
+
+Close:
+
+> This is not another AI trader. It is the missing control plane for autonomous
+> finance: spend limits, quote binding, prompt-injection defense, privacy
+> commitments, and receipt anchoring on Robinhood Chain.
+
+## Backup CLI
+
+```bash
+PYTHONPATH=src python scripts/run_demo.py
+```

@@ -25,6 +25,19 @@ def test_contract_enforces_active_mandate_and_budget():
     assert 'require(block.timestamp <= mandate.expiresAt, "Mandate expired")' in record_fn
     assert "mandate.spentAtomic + amountAtomic <= mandate.maxSpendAtomic" in record_fn
     assert "mandate.spentAtomic += amountAtomic;" in record_fn
+    assert 'require(!usedDecisionNonces[mandateId][decisionNonce], "Nonce used")' in record_fn
+    assert "usedDecisionNonces[mandateId][decisionNonce] = true;" in record_fn
+    assert "mandate.evaluationCount += 1;" in record_fn
+
+
+def test_contract_records_privacy_commitment():
+    src = CONTRACT.read_text(encoding="utf-8")
+    record_fn = _extract_function(src, "recordPaymentEvaluation")
+
+    assert "bytes32 privacyCommitment;" in src
+    assert "uint64 decisionNonce;" in src
+    assert 'require(privacyCommitment != bytes32(0), "Zero privacy")' in record_fn
+    assert "privacyCommitment: privacyCommitment" in record_fn
 
 
 def test_contract_has_two_step_operator_transfer():
@@ -55,4 +68,3 @@ def _extract_function(src: str, name: str) -> str:
         j += 1
     assert depth == 0, f"unbalanced braces while parsing {name}"
     return src[match.start() : j]
-

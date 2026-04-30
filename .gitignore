@@ -8,5 +8,6 @@ __pycache__/
 data/
 dist/
 build/
+output/
+.playwright-cli/
 *.egg-info/
-
