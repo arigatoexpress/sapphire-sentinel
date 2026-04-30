@@ -13,6 +13,7 @@ import json
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime, timedelta
 from decimal import ROUND_HALF_UP, Decimal
+from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
@@ -27,6 +28,8 @@ from sapphire_sentinel.x402 import (
 ROBINHOOD_CHAIN_ID = 46630
 ROBINHOOD_EXPLORER = "https://explorer.testnet.chain.robinhood.com"
 ROBINHOOD_RPC = "https://rpc.testnet.chain.robinhood.com"
+ROOT = Path(__file__).resolve().parents[2]
+DEPLOYMENTS_FILE = ROOT / "data" / "deployments.json"
 X402_SETTLEMENT_NETWORK = "base-sepolia"
 X402_CAIP2_NETWORK = "eip155:84532"
 X402_USDC_ASSET = DEFAULT_USDC_CONTRACTS[X402_CAIP2_NETWORK]
@@ -294,6 +297,8 @@ def evaluate_attempt(
     if approved:
         spend_remaining -= attempt.amount_usdc
 
+    deployment = load_deployment()
+
     return SentinelDecision(
         approved=approved,
         reasons=tuple(reasons),
@@ -313,9 +318,12 @@ def evaluate_attempt(
         payment_payload_preview=payment_payload_preview,
         chain_anchor={
             "contract": "SapphireSentinelRegistry",
+            "contract_address": deployment.get("address"),
             "chain": "robinhood_testnet",
             "chain_id": ROBINHOOD_CHAIN_ID,
-            "explorer": ROBINHOOD_EXPLORER,
+            "explorer": deployment.get("explorer") or ROBINHOOD_EXPLORER,
+            "tx_hash": deployment.get("tx_hash"),
+            "tx_explorer": deployment.get("tx_explorer"),
             "mandate_id": active_mandate.mandate_id,
             "mandate_policy_hash": policy_hash,
             "receipt_id": receipt_id,
@@ -467,6 +475,7 @@ def evaluate_from_payload(payload: dict[str, Any]) -> dict[str, Any]:
 
 
 def build_chain_config() -> dict[str, Any]:
+    deployment = load_deployment()
     return {
         "network": "Robinhood Chain Testnet",
         "chain_id": ROBINHOOD_CHAIN_ID,
@@ -480,6 +489,7 @@ def build_chain_config() -> dict[str, Any]:
             **ROBINHOOD_STOCK_TOKENS,
         },
         "terms": "testnet tokens have no monetary value and may be reset",
+        "deployment": deployment,
     }
 
 
@@ -514,6 +524,20 @@ def build_judging_scorecard() -> list[dict[str, str]]:
             ),
         },
     ]
+
+
+def load_deployment() -> dict[str, Any]:
+    if not DEPLOYMENTS_FILE.exists():
+        return {}
+    try:
+        deployments = json.loads(DEPLOYMENTS_FILE.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return (
+        deployments.get("robinhood_testnet", {})
+        .get("contracts", {})
+        .get("SapphireSentinelRegistry", {})
+    )
 
 
 def _hash_payload(payload: dict[str, Any]) -> str:

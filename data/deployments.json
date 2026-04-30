@@ -1,0 +1,15 @@
+{
+  "robinhood_testnet": {
+    "chain_id": 46630,
+    "rpc": "https://rpc.testnet.chain.robinhood.com",
+    "deployed_at": 1777508599,
+    "contracts": {
+      "SapphireSentinelRegistry": {
+        "address": "0x2EBB91F7B376cB821d90ac4A7d77B0d06b70B36F",
+        "tx_hash": "0xc53ab8fc8cdab4ce7ef5f09fd56fc564756fd8d5e5b7c0396238878d6cc84975",
+        "explorer": "https://explorer.testnet.chain.robinhood.com/address/0x2EBB91F7B376cB821d90ac4A7d77B0d06b70B36F",
+        "tx_explorer": "https://explorer.testnet.chain.robinhood.com/tx/0xc53ab8fc8cdab4ce7ef5f09fd56fc564756fd8d5e5b7c0396238878d6cc84975"
+      }
+    }
+  }
+}

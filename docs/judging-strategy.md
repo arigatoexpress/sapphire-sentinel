@@ -42,4 +42,5 @@ testnet, and addresses a real operational gap in tokenized finance.
 - Dashboard live locally.
 - 90-second video recorded.
 - If a funded testnet key is available, deploy `SapphireSentinelRegistry` and
-  add the explorer link to `data/deployments.json`.
+  add the explorer link to `data/deployments.json`. Done on Robinhood Chain
+  testnet at `0x2EBB91F7B376cB821d90ac4A7d77B0d06b70B36F`.

@@ -84,3 +84,13 @@ python scripts/deploy_robinhood_chain.py --dry-run
 - Stock tokens: `TSLA`, `AMZN`, `PLTR`, `NFLX`, `AMD`
 
 The demo uses Robinhood Chain for on-chain attestations and receipt anchors. x402 settlement is modeled on Base Sepolia because public facilitator support is mature there; a custom Robinhood Chain facilitator is a follow-up.
+
+## Testnet Deployment
+
+`SapphireSentinelRegistry` is deployed on Robinhood Chain testnet:
+
+- Address: `0x2EBB91F7B376cB821d90ac4A7d77B0d06b70B36F`
+- Transaction: `0xc53ab8fc8cdab4ce7ef5f09fd56fc564756fd8d5e5b7c0396238878d6cc84975`
+- Explorer: `https://explorer.testnet.chain.robinhood.com/address/0x2EBB91F7B376cB821d90ac4A7d77B0d06b70B36F`
+
+The deployment used a burner EVM account funded only with Robinhood Chain testnet ETH.

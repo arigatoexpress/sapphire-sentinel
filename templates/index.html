@@ -208,6 +208,7 @@
       <section>
         <h2>Robinhood Chain Anchor</h2>
         <div class="rows">
+          <div class="row"><span>deployed</span><span id="deployed"></span></div>
           <div class="row"><span>policy</span><span id="policy"></span></div>
           <div class="row"><span>result</span><span id="result"></span></div>
           <div class="row"><span>risk</span><span id="risk"></span></div>
@@ -295,6 +296,7 @@ function renderDecision(decision) {
   text('facilitator', decision.http_402.extensions.sentinel.facilitator);
 
   const anchor = decision.chain_anchor;
+  text('deployed', anchor.contract_address ? `${anchor.contract_address} (${anchor.tx_hash})` : 'pending deployment');
   text('policy', anchor.mandate_policy_hash);
   text('result', anchor.result_hash);
   text('risk', anchor.risk_hash);
@@ -388,7 +390,7 @@ async function load() {
   text('chain', `${data.project.primary_chain} ${data.project.chain_id}`);
   text('payment', data.project.settlement_network);
   text('budget', `$${data.mandate.remaining_usdc} / $${data.mandate.max_spend_usdc}`);
-  text('contract-kpi', data.approved_flow.chain_anchor.contract);
+  text('contract-kpi', data.approved_flow.chain_anchor.contract_address || data.approved_flow.chain_anchor.contract);
   text('mode', data.project.mode);
   renderScenarios();
   renderPrivacy();

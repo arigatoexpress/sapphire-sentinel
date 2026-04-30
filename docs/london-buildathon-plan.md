@@ -52,23 +52,28 @@ privacy commitment, and replay nonce before a receipt hash is anchored on-chain.
 ## Safe Defaults
 
 - `execution_enabled=false` in every order draft.
-- `broadcast=false` in the chain anchor preview until a funded testnet deploy is
-  intentionally run.
+- `broadcast=false` in the chain anchor preview unless a judge/operator
+  intentionally records a receipt transaction.
 - x402 settlement is simulated on Base Sepolia because public facilitator
   support is mature there; Robinhood Chain receives the receipt anchor.
 - The Sentinel contract is non-custodial and has no withdraw path.
 
+## Live Testnet Anchor
+
+`SapphireSentinelRegistry` has been deployed to Robinhood Chain testnet:
+
+- Address: `0x2EBB91F7B376cB821d90ac4A7d77B0d06b70B36F`
+- Transaction: `0xc53ab8fc8cdab4ce7ef5f09fd56fc564756fd8d5e5b7c0396238878d6cc84975`
+- Explorer: `https://explorer.testnet.chain.robinhood.com/address/0x2EBB91F7B376cB821d90ac4A7d77B0d06b70B36F`
+
 ## Next Buildathon Steps
 
-1. Run `python3 scripts/deploy_robinhood_chain.py --dry-run` once `py-solc-x`
-   is available.
-2. Deploy `SapphireSentinelRegistry` to Robinhood Chain testnet with a funded
-   testnet key.
-3. Replace the dry-run anchor preview with a `recordPaymentEvaluation(...)`
+1. Verify the contract source on the Robinhood Chain Blockscout explorer.
+2. Replace the dry-run anchor preview with a `recordPaymentEvaluation(...)`
    transaction in testnet mode only.
-4. Add a focused Oasis Sapphire sidecar contract for confidential policy
+3. Add a focused Oasis Sapphire sidecar contract for confidential policy
    evaluation.
-5. Add a small Zama/FHEVM local mock that produces the `resultHash` and
+4. Add a small Zama/FHEVM local mock that produces the `resultHash` and
    `riskHash` from hidden basket weights.
-6. Record a 90-second demo: approved payment, blocked injection attempt,
+5. Record a 90-second demo: approved payment, blocked injection attempt,
    Robinhood Chain explorer receipt, and non-submitting RWA order draft.

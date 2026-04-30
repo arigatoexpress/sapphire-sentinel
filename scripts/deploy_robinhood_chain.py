@@ -128,7 +128,10 @@ def deploy(compiled: dict) -> str:
     tx["gas"] = w3.eth.estimate_gas(tx)
     signed = account.sign_transaction(tx)
     tx_hash = w3.eth.send_raw_transaction(signed.raw_transaction)
-    log.info("tx sent: 0x%s", tx_hash.hex())
+    tx_hash_hex = tx_hash.hex()
+    if not tx_hash_hex.startswith("0x"):
+        tx_hash_hex = f"0x{tx_hash_hex}"
+    log.info("tx sent: %s", tx_hash_hex)
     receipt = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=120)
     if receipt["status"] != 1:
         raise RuntimeError("deployment failed")
@@ -144,8 +147,9 @@ def deploy(compiled: dict) -> str:
                     "contracts": {
                         CONTRACT_NAME: {
                             "address": address,
-                            "tx_hash": tx_hash.hex(),
+                            "tx_hash": tx_hash_hex,
                             "explorer": f"{EXPLORER_URL}/address/{address}",
+                            "tx_explorer": f"{EXPLORER_URL}/tx/{tx_hash_hex}",
                         }
                     },
                 }
