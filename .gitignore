@@ -13,3 +13,4 @@ build/
 output/
 .playwright-cli/
 *.egg-info/
+*.odt

@@ -1,0 +1,58 @@
+# Sapphire Sentinel — Production Dockerfile
+# Multi-stage build for minimal runtime image
+
+# ─── Build stage ───
+FROM python:3.12-slim AS builder
+
+WORKDIR /app
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    libc6-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy dependency metadata
+COPY pyproject.toml .
+RUN pip install --upgrade pip && \
+    pip install --user -e ".[dev,x402,deploy]"
+
+# ─── Runtime stage ───
+FROM python:3.12-slim AS runtime
+
+WORKDIR /app
+
+# Create non-root user
+RUN groupadd -r sentinel && useradd -r -g sentinel sentinel
+
+# Copy installed packages from builder
+COPY --from=builder /root/.local /home/sentinel/.local
+ENV PATH=/home/sentinel/.local/bin:$PATH
+
+# Copy application code
+COPY src/ ./src/
+COPY templates/ ./templates/
+COPY data/ ./data/
+COPY contracts/ ./contracts/
+COPY scripts/ ./scripts/
+COPY artifacts/ ./artifacts/
+COPY output/ ./output/
+
+# Install the package in editable mode (runtime only, no build deps)
+RUN pip install --no-deps -e .
+
+# Fix ownership
+RUN chown -R sentinel:sentinel /app /home/sentinel
+
+USER sentinel
+
+# Expose Flask default port
+EXPOSE 8098
+
+ENV FLASK_APP=src/sapphire_sentinel/app.py
+ENV PYTHONPATH=/app/src
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8098/health')" || exit 1
+
+CMD ["python", "-m", "flask", "run", "--host=0.0.0.0", "--port=8098"]

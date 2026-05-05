@@ -20,7 +20,9 @@ from sapphire_sentinel.x402 import (
     verify_mock_payment_header,
 )
 
-app = Flask(__name__, template_folder="../../templates")
+import pathlib
+
+app = Flask(__name__, template_folder=str(pathlib.Path(__file__).parent.parent.parent / "templates"))
 _X402_NONCES: set[str] = set()
 
 
@@ -145,6 +147,11 @@ def _payment_required_response(decision, *, error: str | None = None):
     response.headers["X-Sentinel-Receipt"] = decision.receipt_id
     response.headers["X-Sentinel-Payment-Status"] = "required" if not error else "rejected"
     return response
+
+
+@app.get("/health")
+def health():
+    return jsonify({"status": "ok", "service": "sapphire-sentinel"})
 
 
 if __name__ == "__main__":
