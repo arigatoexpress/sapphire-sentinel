@@ -52,6 +52,14 @@ def test_index_uses_static_workbench_assets():
     assert "fetch('/api/evaluate'" in js_body
 
 
+def test_dockerfile_does_not_require_generated_output_dir():
+    dockerfile = (Path(__file__).resolve().parents[1] / "Dockerfile").read_text()
+
+    assert "COPY output/" not in dockerfile
+    assert "RUN mkdir -p output" in dockerfile
+    assert "COPY pyproject.toml README.md ./" in dockerfile
+
+
 def test_evaluate_endpoint_blocks_untrusted_domain():
     client = app.test_client()
 
