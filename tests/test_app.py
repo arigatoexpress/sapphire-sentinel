@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 from sapphire_sentinel.app import _X402_NONCES, app
 from sapphire_sentinel.sentinel import default_attempt, evaluate_attempt
 from sapphire_sentinel.x402 import build_mock_payment_payload, encode_payment_header
@@ -27,6 +29,7 @@ def test_demo_endpoint_returns_safe_state():
 
 def test_index_uses_static_workbench_assets():
     client = app.test_client()
+    package_root = Path(__file__).resolve().parents[1] / "src" / "sapphire_sentinel"
 
     response = client.get("/")
     html = response.get_data(as_text=True)
@@ -39,6 +42,8 @@ def test_index_uses_static_workbench_assets():
     assert "<style>" not in html
     assert "function renderDecision" not in html
     assert "Settlement <strong>mock x402 only</strong>" in html
+    assert (package_root / "templates" / "index.html").exists()
+    assert not (package_root.parents[1] / "templates" / "index.html").exists()
     assert css.status_code == 200
     assert ".safety-strip" in css.get_data(as_text=True)
     assert js.status_code == 200

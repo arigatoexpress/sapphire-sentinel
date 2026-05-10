@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-from pathlib import Path
 
 from flask import Flask, jsonify, make_response, render_template, request
 
@@ -21,9 +20,7 @@ from sapphire_sentinel.x402 import (
     verify_mock_payment_header,
 )
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-
-app = Flask(__name__, template_folder=str(PROJECT_ROOT / "templates"))
+app = Flask(__name__, template_folder="templates")
 _X402_NONCES: set[str] = set()
 
 

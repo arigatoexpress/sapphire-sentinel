@@ -31,7 +31,6 @@ ENV PATH=/home/sentinel/.local/bin:$PATH
 
 # Copy application code
 COPY src/ ./src/
-COPY templates/ ./templates/
 COPY data/ ./data/
 COPY contracts/ ./contracts/
 COPY scripts/ ./scripts/
