@@ -43,9 +43,7 @@ def load_private_key() -> str:
         key = SECRETS_FILE.read_text(encoding="utf-8").strip()
         if key:
             return key
-    raise RuntimeError(
-        f"No deploy key found. Set ROBINHOOD_DEPLOY_KEY or create {SECRETS_FILE}."
-    )
+    raise RuntimeError(f"No deploy key found. Set ROBINHOOD_DEPLOY_KEY or create {SECRETS_FILE}.")
 
 
 def compile_contract() -> dict:
@@ -173,7 +171,9 @@ def main() -> int:
     compiled = compile_contract()
     log.info("compiled %s with %d ABI entries", CONTRACT_NAME, len(compiled["abi"]))
     if args.dry_run:
-        log.info("dry-run mode; bytecode %d bytes; skipping deployment", len(compiled["bytecode"]) // 2)
+        log.info(
+            "dry-run mode; bytecode %d bytes; skipping deployment", len(compiled["bytecode"]) // 2
+        )
         return 0
     address = deploy(compiled)
     log.info("deployed %s to %s", CONTRACT_NAME, address)

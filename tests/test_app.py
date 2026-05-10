@@ -34,8 +34,8 @@ def test_index_uses_static_workbench_assets():
     js = client.get("/static/app.js")
 
     assert response.status_code == 200
-    assert '/static/styles.css' in html
-    assert '/static/app.js' in html
+    assert "/static/styles.css" in html
+    assert "/static/app.js" in html
     assert "<style>" not in html
     assert "function renderDecision" not in html
     assert "Settlement <strong>mock x402 only</strong>" in html

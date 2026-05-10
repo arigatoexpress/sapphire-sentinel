@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from decimal import Decimal
-from typing import Any
+from typing import Any, TypedDict
 
 from sapphire_sentinel.sentinel import (
     PaymentAttempt,
@@ -13,8 +13,16 @@ from sapphire_sentinel.sentinel import (
 )
 
 
+class ScenarioSpec(TypedDict):
+    id: str
+    title: str
+    attacker_move: str
+    expected: str
+    attempt: PaymentAttempt
+
+
 def build_scenario_matrix() -> list[dict[str, Any]]:
-    scenarios = [
+    scenarios: list[ScenarioSpec] = [
         {
             "id": "safe-rwa-signal",
             "title": "Approved private RWA signal",
@@ -71,7 +79,8 @@ def build_scenario_matrix() -> list[dict[str, Any]]:
     ]
     output: list[dict[str, Any]] = []
     for scenario in scenarios:
-        decision = evaluate_attempt(scenario["attempt"])
+        attempt = scenario["attempt"]
+        decision = evaluate_attempt(attempt)
         output.append(
             {
                 "id": scenario["id"],
@@ -79,11 +88,11 @@ def build_scenario_matrix() -> list[dict[str, Any]]:
                 "attacker_move": scenario["attacker_move"],
                 "expected": scenario["expected"],
                 "attempt": {
-                    "resource": scenario["attempt"].resource,
-                    "amount_usdc": str(scenario["attempt"].amount_usdc),
-                    "action": scenario["attempt"].action,
-                    "payload_summary": scenario["attempt"].payload_summary,
-                    "result_summary": scenario["attempt"].result_summary,
+                    "resource": attempt.resource,
+                    "amount_usdc": str(attempt.amount_usdc),
+                    "action": attempt.action,
+                    "payload_summary": attempt.payload_summary,
+                    "result_summary": attempt.result_summary,
                 },
                 "approved": decision.approved,
                 "risk_flags": decision.risk_flags,

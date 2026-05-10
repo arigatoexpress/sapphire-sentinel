@@ -556,8 +556,12 @@ def build_receipt_mirrors() -> list[dict[str, Any]]:
                 "tx_explorer": deployment.get("tx_explorer"),
                 "source_verified": bool(deployment.get("source_verified")),
                 "demo_events": demo_events,
-                "approved_receipt_explorer": (demo_events.get("approved_receipt") or {}).get("explorer"),
-                "blocked_receipt_explorer": (demo_events.get("blocked_receipt") or {}).get("explorer"),
+                "approved_receipt_explorer": (demo_events.get("approved_receipt") or {}).get(
+                    "explorer"
+                ),
+                "blocked_receipt_explorer": (demo_events.get("blocked_receipt") or {}).get(
+                    "explorer"
+                ),
                 "claim_boundary": network.claim_boundary,
                 "metadata": network.metadata,
             }
@@ -611,12 +615,16 @@ def build_proof_points() -> list[dict[str, str]]:
         },
         {
             "label": "Approved receipt",
-            "status": "anchored" if (demo_events.get("approved_receipt") or {}).get("tx_hash") else "preview",
+            "status": "anchored"
+            if (demo_events.get("approved_receipt") or {}).get("tx_hash")
+            else "preview",
             "evidence": (demo_events.get("approved_receipt") or {}).get("explorer", ""),
         },
         {
             "label": "Blocked receipt",
-            "status": "anchored" if (demo_events.get("blocked_receipt") or {}).get("tx_hash") else "preview",
+            "status": "anchored"
+            if (demo_events.get("blocked_receipt") or {}).get("tx_hash")
+            else "preview",
             "evidence": (demo_events.get("blocked_receipt") or {}).get("explorer", ""),
         },
         {
@@ -662,11 +670,7 @@ def load_contract_deployment(network_id: str) -> dict[str, Any]:
         deployments = json.loads(DEPLOYMENTS_FILE.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
         return {}
-    return (
-        deployments.get(network_id, {})
-        .get("contracts", {})
-        .get("SapphireSentinelRegistry", {})
-    )
+    return deployments.get(network_id, {}).get("contracts", {}).get("SapphireSentinelRegistry", {})
 
 
 def _mirror_status(network_id: str, deployment: dict[str, Any]) -> str:
@@ -679,7 +683,9 @@ def _mirror_status(network_id: str, deployment: dict[str, Any]) -> str:
     return "deployed_unverified"
 
 
-def _demo_receipt_record(demo_events: dict[str, Any], approved: bool, receipt_id: str) -> dict[str, Any]:
+def _demo_receipt_record(
+    demo_events: dict[str, Any], approved: bool, receipt_id: str
+) -> dict[str, Any]:
     key = "approved_receipt" if approved else "blocked_receipt"
     record = demo_events.get(key) or {}
     if record.get("receipt_id") == receipt_id:

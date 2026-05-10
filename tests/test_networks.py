@@ -17,7 +17,10 @@ def test_network_registry_has_core_hackathon_rails():
     assert matrix["megaeth_testnet"]["chain_id"] == 6343
     assert matrix["megaeth_mainnet"]["chain_id"] == 4326
     assert matrix["megaeth_mainnet"]["deploy_enabled"] is False
-    assert matrix["megaeth_mainnet"]["metadata"]["MEGA"] == "0x28B7E77f82B25B95953825F1E3eA0E36c1c29861"
+    assert (
+        matrix["megaeth_mainnet"]["metadata"]["MEGA"]
+        == "0x28B7E77f82B25B95953825F1E3eA0E36c1c29861"
+    )
     assert matrix["zama_sepolia"]["chain_id"] == 11155111
     assert matrix["aztec_private_intent"]["chain_id"] is None
 

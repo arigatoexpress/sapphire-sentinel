@@ -240,7 +240,9 @@ def api_evaluate():
 
 def _payment_required_response(decision, *, error: str | None = None):
     payment_required = (
-        build_402_response([decision.payment_requirements], error=error) if error else decision.http_402
+        build_402_response([decision.payment_requirements], error=error)
+        if error
+        else decision.http_402
     )
     response = make_response(jsonify(payment_required), 402)
     response.headers["PAYMENT-REQUIRED"] = encode_payment_required(payment_required)

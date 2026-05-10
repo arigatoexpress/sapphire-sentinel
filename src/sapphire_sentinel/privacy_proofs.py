@@ -84,12 +84,8 @@ def build_privacy_proof_bundle(
         },
     )
 
-    aztec_private = {
-        "private_mandate_secret": "redacted",
-        "private_user_salt": "redacted",
-        "private_balance_atomic": 3_200_000,
-        "private_risk_score_bps": 214,
-    }
+    aztec_private_balance_atomic = 3_200_000
+    aztec_private_risk_score_bps = 214
     aztec_public = {
         "policy_hash": policy_hash,
         "resource_hash": resource_hash,
@@ -101,8 +97,8 @@ def build_privacy_proof_bundle(
         "aztec-private-intent-v1",
         {
             **aztec_public,
-            "private_balance_passed": aztec_private["private_balance_atomic"] >= amount_atomic,
-            "private_risk_passed": aztec_private["private_risk_score_bps"] <= 500,
+            "private_balance_passed": aztec_private_balance_atomic >= amount_atomic,
+            "private_risk_passed": aztec_private_risk_score_bps <= 500,
         },
     )
 

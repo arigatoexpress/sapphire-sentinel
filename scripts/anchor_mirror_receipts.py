@@ -52,11 +52,7 @@ def main() -> int:
         raise RuntimeError(f"network is not a deployable mirror target: {network.id}")
 
     deployments = _load_deployments()
-    contract_meta = (
-        deployments.get(network.id, {})
-        .get("contracts", {})
-        .get(CONTRACT_NAME, {})
-    )
+    contract_meta = deployments.get(network.id, {}).get("contracts", {}).get(CONTRACT_NAME, {})
     address = contract_meta.get("address")
     if not address:
         raise RuntimeError(f"Deployment address missing for {network.id}.")
@@ -106,7 +102,9 @@ def main() -> int:
     seed = _seed_receipt(mandate, approved)
     if _receipt_unknown(contract, seed["receipt_id"]):
         tx_hash = _record(contract, w3, account, network.chain_id, seed, approved=True)
-        demo_events["seed_prior_spend"] = _tx_record(network, tx_hash, receipt_id=seed["receipt_id"])
+        demo_events["seed_prior_spend"] = _tx_record(
+            network, tx_hash, receipt_id=seed["receipt_id"]
+        )
         print(f"seeded prior spend: {tx_hash}")
     else:
         print("seed prior spend already recorded; skipping")
@@ -142,7 +140,9 @@ def main() -> int:
         demo_events.setdefault(label, {})["receipt_id"] = decision.receipt_id
 
     demo_events["updated_at"] = int(time.time())
-    demo_events["remaining_spend_atomic"] = int(contract.functions.remainingSpend(_b32(mkey)).call())
+    demo_events["remaining_spend_atomic"] = int(
+        contract.functions.remainingSpend(_b32(mkey)).call()
+    )
     demo_events["remaining_spend_usdc"] = str(
         Decimal(demo_events["remaining_spend_atomic"]) / USDC_DECIMALS
     )
