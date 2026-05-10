@@ -19,6 +19,28 @@ def test_demo_endpoint_returns_safe_state():
     assert body["safety"]["live_trading_enabled"] is False
 
 
+def test_index_uses_static_workbench_assets():
+    client = app.test_client()
+
+    response = client.get("/")
+    html = response.get_data(as_text=True)
+    css = client.get("/static/styles.css")
+    js = client.get("/static/app.js")
+
+    assert response.status_code == 200
+    assert '/static/styles.css' in html
+    assert '/static/app.js' in html
+    assert "<style>" not in html
+    assert "function renderDecision" not in html
+    assert "Settlement <strong>mock x402 only</strong>" in html
+    assert css.status_code == 200
+    assert ".safety-strip" in css.get_data(as_text=True)
+    assert js.status_code == 200
+    js_body = js.get_data(as_text=True)
+    assert "async function evaluateResource" in js_body
+    assert "fetch('/api/evaluate'" in js_body
+
+
 def test_evaluate_endpoint_blocks_untrusted_domain():
     client = app.test_client()
 
