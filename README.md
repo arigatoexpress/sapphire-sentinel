@@ -95,6 +95,7 @@ before unlocking the report.
 ```bash
 pytest -q
 ruff check .
+python3 scripts/browser_smoke.py
 python3 scripts/deploy_robinhood_chain.py --dry-run
 python3 scripts/probe_networks.py
 python3 scripts/deploy_registry.py --network megaeth_testnet --dry-run
