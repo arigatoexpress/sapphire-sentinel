@@ -19,7 +19,9 @@ def test_privacy_proof_bundle_exports_public_commitments_only():
     assert data["live_proving_enabled"] is False
     assert [artifact["engine"] for artifact in data["artifacts"]] == ["Zama fhEVM", "Aztec"]
     assert all(artifact["exported_commitment"].startswith("0x") for artifact in data["artifacts"])
-    assert all("private_balance_atomic" not in artifact["public_inputs"] for artifact in data["artifacts"])
+    assert all(
+        "private_balance_atomic" not in artifact["public_inputs"] for artifact in data["artifacts"]
+    )
     assert data["artifacts"][0]["receipt_binding"]["risk_hash"] == "0x" + "44" * 32
     assert data["artifacts"][1]["artifact_path"].endswith("aztec_private_intent_note.nr")
 

@@ -162,7 +162,9 @@ def probe_apps(timeout: float) -> list[dict[str, Any]]:
 
 
 def probe_url(name: str, url: str, timeout: float) -> dict[str, Any]:
-    request = urllib.request.Request(url, method="HEAD", headers={"User-Agent": "sapphire-sentinel/0.1"})
+    request = urllib.request.Request(
+        url, method="HEAD", headers={"User-Agent": "sapphire-sentinel/0.1"}
+    )
     try:
         with urllib.request.urlopen(request, timeout=timeout) as response:
             return {

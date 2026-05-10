@@ -4,7 +4,9 @@ import re
 from pathlib import Path
 
 CONTRACT = Path(__file__).resolve().parents[1] / "contracts" / "SapphireSentinelRegistry.sol"
-ZAMA_MOCK = Path(__file__).resolve().parents[1] / "contracts" / "privacy" / "EncryptedRiskGateMock.sol"
+ZAMA_MOCK = (
+    Path(__file__).resolve().parents[1] / "contracts" / "privacy" / "EncryptedRiskGateMock.sol"
+)
 
 
 def test_contract_is_non_custodial():

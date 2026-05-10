@@ -20,9 +20,7 @@ from sapphire_sentinel.x402 import (
     verify_mock_payment_header,
 )
 
-import pathlib
-
-app = Flask(__name__, template_folder=str(pathlib.Path(__file__).parent.parent.parent / "templates"))
+app = Flask(__name__, template_folder="templates")
 _X402_NONCES: set[str] = set()
 
 
@@ -34,6 +32,106 @@ def index():
 @app.get("/api/demo")
 def api_demo():
     return jsonify(build_demo_state())
+
+
+@app.get("/api/frontend-contract")
+def api_frontend_contract():
+    """Expose the demo UI contract for repeatable browser smoke checks.
+
+    This route is metadata only. It describes visible selectors, safe actions,
+    and expected readback states without reading secrets, signing transactions,
+    settling x402 payments, or sending external messages.
+    """
+
+    return jsonify(
+        {
+            "schema": "sapphire_sentinel.frontend_contract.v1",
+            "route": "/",
+            "mode": "testnet_paper_only",
+            "settlement": "mock_x402_only",
+            "liveSettlementEnabled": False,
+            "executionEnabled": False,
+            "telegramSendsEnabled": False,
+            "moneyMovementEnabled": False,
+            "externalMutationDefault": "disabled",
+            "requiredText": [
+                "Sapphire Sentinel",
+                "testnet paper-only",
+                "mock x402 only",
+                "x402 Payment Quote",
+                "Robinhood Chain Anchor",
+                "MegaETH Mainnet Scout",
+            ],
+            "requiredSelectors": [
+                "#thesis",
+                ".safety-strip",
+                "#scenario-list",
+                "#eval-resource",
+                "#eval-amount",
+                "#eval-summary",
+                "#eval-button",
+                "#eval-output",
+                "#state",
+                "#receipt",
+                "#resource",
+                "#network",
+                "#amount",
+                "#contract-kpi",
+                "#megaeth-app-list",
+                "#scorecard",
+            ],
+            "apiRoutes": [
+                {
+                    "method": "GET",
+                    "path": "/api/demo",
+                    "expectedStatus": 200,
+                    "purpose": "hydrate public judge workbench",
+                },
+                {
+                    "method": "POST",
+                    "path": "/api/evaluate",
+                    "expectedStatus": 200,
+                    "purpose": "policy preview only; execution_enabled is always false",
+                },
+                {
+                    "method": "GET",
+                    "path": "/api/x402/paywall",
+                    "expectedStatus": 402,
+                    "purpose": "advertise simulated x402 v2 payment requirement",
+                },
+                {
+                    "method": "GET",
+                    "path": "/api/x402/sentinel-report",
+                    "expectedStatus": 402,
+                    "purpose": "fail closed until a bound PAYMENT-SIGNATURE is supplied",
+                },
+            ],
+            "primaryActions": [
+                {
+                    "id": "evaluate-resource",
+                    "selector": "#eval-button",
+                    "method": "POST",
+                    "path": "/api/evaluate",
+                    "resultSelector": "#eval-output",
+                    "expectedMode": "policy_preview_only",
+                    "externalEffects": False,
+                },
+                {
+                    "id": "select-red-team-scenario",
+                    "selector": "#scenario-list .scenario",
+                    "resultSelector": "#state",
+                    "externalEffects": False,
+                },
+            ],
+            "blockedCapabilities": [
+                "live x402 facilitator settlement",
+                "real Robinhood order submission",
+                "mainnet value movement",
+                "Telegram or external customer sends",
+                "secret reads or secret display",
+            ],
+        }
+    )
 
 
 @app.get("/api/health")
@@ -139,7 +237,9 @@ def api_evaluate():
 
 def _payment_required_response(decision, *, error: str | None = None):
     payment_required = (
-        build_402_response([decision.payment_requirements], error=error) if error else decision.http_402
+        build_402_response([decision.payment_requirements], error=error)
+        if error
+        else decision.http_402
     )
     response = make_response(jsonify(payment_required), 402)
     response.headers["PAYMENT-REQUIRED"] = encode_payment_required(payment_required)

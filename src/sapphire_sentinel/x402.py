@@ -85,7 +85,9 @@ class PaymentVerificationResult:
         }
 
 
-def build_402_response(requirements: list[PaymentRequirements], *, error: str | None = None) -> dict[str, Any]:
+def build_402_response(
+    requirements: list[PaymentRequirements], *, error: str | None = None
+) -> dict[str, Any]:
     first = requirements[0] if requirements else None
     return {
         "x402Version": 2,
@@ -270,9 +272,13 @@ def verify_mock_payment_header(
     resource = str(payload.get("resource") or accepted.get("resource") or "")
     network = str(accepted.get("network") or payload.get("network") or "")
     asset = str(accepted.get("asset") or payload.get("asset") or "")
-    amount = str(authorization.get("value") or accepted.get("amount") or payload.get("amount") or "")
+    amount = str(
+        authorization.get("value") or accepted.get("amount") or payload.get("amount") or ""
+    )
     payer = str(authorization.get("from") or "")
-    pay_to = str(authorization.get("to") or authorization.get("payTo") or accepted.get("payTo") or "")
+    pay_to = str(
+        authorization.get("to") or authorization.get("payTo") or accepted.get("payTo") or ""
+    )
     nonce = str(authorization.get("nonce") or "")
     signature = str(payment_payload.get("signature") or payload.get("signature") or "")
     sentinel_extensions = _dict_at(_dict_at(payload, "extensions"), "sentinel")
@@ -281,15 +287,25 @@ def verify_mock_payment_header(
     if not _nonempty_hexish(signature):
         return PaymentVerificationResult(valid=False, error="missing simulated payment signature")
     if not _same_text(resource, requirement.resource):
-        return PaymentVerificationResult(valid=False, error="resource does not match payment requirement")
+        return PaymentVerificationResult(
+            valid=False, error="resource does not match payment requirement"
+        )
     if network and not _same_text(network, requirement.network):
-        return PaymentVerificationResult(valid=False, error="network does not match payment requirement")
+        return PaymentVerificationResult(
+            valid=False, error="network does not match payment requirement"
+        )
     if asset and not _same_address(asset, requirement.asset):
-        return PaymentVerificationResult(valid=False, error="asset does not match payment requirement")
+        return PaymentVerificationResult(
+            valid=False, error="asset does not match payment requirement"
+        )
     if not _same_text(amount, requirement.amount):
-        return PaymentVerificationResult(valid=False, error="amount does not match payment requirement")
+        return PaymentVerificationResult(
+            valid=False, error="amount does not match payment requirement"
+        )
     if not _same_address(pay_to, requirement.pay_to):
-        return PaymentVerificationResult(valid=False, error="payTo does not match payment requirement")
+        return PaymentVerificationResult(
+            valid=False, error="payTo does not match payment requirement"
+        )
     if not _nonempty_hexish(payer):
         return PaymentVerificationResult(valid=False, error="payer is required")
     if not _nonempty_hexish(nonce):

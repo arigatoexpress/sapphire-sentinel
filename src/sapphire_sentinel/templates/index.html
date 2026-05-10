@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>Sapphire Sentinel</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <h1>Sapphire Sentinel</h1>
+      <p id="thesis">Loading...</p>
+    </div>
+    <div class="badge">testnet paper-only</div>
+  </header>
+
+  <div class="safety-strip" aria-label="Safety posture">
+    <span>Mode <strong>testnet paper-only</strong></span>
+    <span>Settlement <strong>mock x402 only</strong></span>
+    <span>Orders <strong>draft only</strong></span>
+    <span>Receipts <strong>public testnet anchors</strong></span>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi"><div class="label">Chain</div><div class="value" id="chain">...</div></div>
+    <div class="kpi"><div class="label">x402 Rail</div><div class="value" id="payment">...</div></div>
+    <div class="kpi"><div class="label">Budget</div><div class="value" id="budget">...</div></div>
+    <div class="kpi"><div class="label">Contract</div><div class="value" id="contract-kpi">...</div></div>
+    <div class="kpi"><div class="label">Mode</div><div class="value" id="mode">...</div></div>
+  </div>
+
+  <div class="layout">
+    <div>
+      <section>
+        <h2>Red-Team Matrix</h2>
+        <div class="scenario-list" id="scenario-list"></div>
+      </section>
+
+      <section>
+        <h2>Live Resource Review</h2>
+        <div class="form-grid">
+          <input id="eval-resource" value="https://signals.sapphire.local/api/private-rwa-signal?basket=RH-STOCKS">
+          <div class="split">
+            <input id="eval-amount" value="0.012">
+            <button id="eval-button">Evaluate</button>
+          </div>
+          <textarea id="eval-summary">agent asks for private TSLA/AMZN/PLTR/NFLX/AMD risk signal</textarea>
+        </div>
+        <pre id="eval-output">{}</pre>
+      </section>
+    </div>
+
+    <div>
+      <section>
+        <div class="decision">
+          <div>
+            <div class="label">Policy Verdict</div>
+            <div id="state" class="state">...</div>
+          </div>
+          <div id="receipt" class="hash"></div>
+        </div>
+        <div class="trace" id="trace"></div>
+      </section>
+
+      <section>
+        <h2>x402 Payment Quote</h2>
+        <div class="rows">
+          <div class="row"><span>resource</span><span id="resource"></span></div>
+          <div class="row"><span>network</span><span id="network"></span></div>
+          <div class="row"><span>asset</span><span id="asset"></span></div>
+          <div class="row"><span>amount</span><span id="amount"></span></div>
+          <div class="row"><span>pay to</span><span id="payto"></span></div>
+          <div class="row"><span>facilitator</span><span id="facilitator"></span></div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Robinhood Chain Anchor</h2>
+        <div class="rows">
+          <div class="row"><span>deployed</span><span id="deployed"></span></div>
+          <div class="row"><span>verified</span><span id="verified"></span></div>
+          <div class="row"><span>policy</span><span id="policy"></span></div>
+          <div class="row"><span>result</span><span id="result"></span></div>
+          <div class="row"><span>risk</span><span id="risk"></span></div>
+          <div class="row"><span>privacy</span><span id="privacy"></span></div>
+          <div class="row"><span>nonce</span><span id="nonce"></span></div>
+          <div class="row"><span>broadcast</span><span id="broadcast"></span></div>
+          <div class="row"><span>record tx</span><span id="record-tx"></span></div>
+          <div class="row"><span>remaining</span><span id="chain-remaining"></span></div>
+        </div>
+      </section>
+
+      <section>
+        <h2>On-Chain Event Proofs</h2>
+        <div class="rows">
+          <div class="row"><span>mandate</span><span id="event-mandate"></span></div>
+          <div class="row"><span>prior spend</span><span id="event-seed"></span></div>
+          <div class="row"><span>approved</span><span id="event-approved"></span></div>
+          <div class="row"><span>blocked</span><span id="event-blocked"></span></div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Receipt Mirrors</h2>
+        <div class="matrix" id="mirror-list"></div>
+      </section>
+
+      <section>
+        <h2>MegaETH Mainnet Scout</h2>
+        <div class="rows rows-spaced">
+          <div class="row"><span>network</span><span id="megaeth-mainnet-network"></span></div>
+          <div class="row"><span>policy</span><span id="megaeth-mainnet-policy"></span></div>
+          <div class="row"><span>tokens</span><span id="megaeth-mainnet-tokens"></span></div>
+        </div>
+        <div class="matrix" id="megaeth-app-list"></div>
+      </section>
+
+      <section>
+        <h2>Network Registry</h2>
+        <div class="matrix" id="network-list"></div>
+      </section>
+    </div>
+
+    <div class="side">
+      <section>
+        <h2>Privacy Sidecars</h2>
+        <div class="privacy" id="privacy-list"></div>
+      </section>
+
+      <section>
+        <h2>Privacy Proof Bundle</h2>
+        <div class="proof" id="privacy-proof-list"></div>
+      </section>
+
+      <section>
+        <h2>Proof Points</h2>
+        <div class="proof" id="proof-list"></div>
+      </section>
+
+      <section>
+        <h2>Integration Roadmap</h2>
+        <div class="matrix" id="roadmap-list"></div>
+      </section>
+
+      <section>
+        <h2>Order Draft</h2>
+        <pre id="order-draft">{}</pre>
+      </section>
+
+      <section>
+        <h2>Judge Scorecard</h2>
+        <div class="score" id="scorecard"></div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</body>
+</html>

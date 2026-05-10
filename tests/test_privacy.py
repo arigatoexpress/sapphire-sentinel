@@ -25,4 +25,6 @@ def test_primary_privacy_commitment_matches_oasis_attestation():
         "resource_hash": "0x" + "dd" * 32,
     }
 
-    assert primary_privacy_commitment(**payload) == build_privacy_attestations(**payload)[0].commitment
+    assert (
+        primary_privacy_commitment(**payload) == build_privacy_attestations(**payload)[0].commitment
+    )

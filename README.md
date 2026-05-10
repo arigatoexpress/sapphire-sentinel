@@ -111,6 +111,7 @@ only when that burner address has MegaETH testnet gas.
 | Endpoint | Purpose |
 |---|---|
 | `GET /api/demo` | Full judge-facing demo state |
+| `GET /api/frontend-contract` | Browser-smoke contract for required UI selectors, readback routes, and disabled external effects |
 | `GET /api/scenarios` | Red-team matrix and pass/fail outcomes |
 | `GET /api/privacy` | Oasis/Zama/Aztec sidecar commitments and constraints |
 | `GET /api/privacy/proofs` | Local Zama/Aztec proof bundle with private witnesses redacted |

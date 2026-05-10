@@ -96,7 +96,11 @@ def build_privacy_attestations(
             engine="Aztec",
             role="private intent evidence",
             public_claim="a user can keep balance or intent details private while exporting a commitment",
-            private_inputs=("private balance note", "private purchase intent", "user identity link"),
+            private_inputs=(
+                "private balance note",
+                "private purchase intent",
+                "user identity link",
+            ),
             public_outputs=("resource_hash", "result_hash", "privacy_commitment"),
             commitment=aztec_commitment,
             status="local/private-intent blueprint",

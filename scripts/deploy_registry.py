@@ -134,7 +134,9 @@ def preflight(network: NetworkProfile, *, key_alias: str | None = None) -> int:
     return 0
 
 
-def deploy(network: NetworkProfile, compiled: dict[str, Any], *, key_alias: str | None = None) -> str:
+def deploy(
+    network: NetworkProfile, compiled: dict[str, Any], *, key_alias: str | None = None
+) -> str:
     from eth_account import Account  # type: ignore[import]
     from web3 import Web3  # type: ignore[import]
 

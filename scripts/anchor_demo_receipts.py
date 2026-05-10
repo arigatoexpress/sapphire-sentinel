@@ -49,9 +49,7 @@ def main() -> int:
 
     deployments = _load_deployments()
     contract_meta = (
-        deployments.get("robinhood_testnet", {})
-        .get("contracts", {})
-        .get(CONTRACT_NAME, {})
+        deployments.get("robinhood_testnet", {}).get("contracts", {}).get(CONTRACT_NAME, {})
     )
     address = contract_meta.get("address")
     if not address:
@@ -186,7 +184,9 @@ def _send(w3: Any, account: Any, fn: Any) -> str:
     return tx_hash
 
 
-def _record(contract: Any, w3: Any, account: Any, receipt: dict[str, Any], *, approved: bool) -> str:
+def _record(
+    contract: Any, w3: Any, account: Any, receipt: dict[str, Any], *, approved: bool
+) -> str:
     return _send(
         w3,
         account,
