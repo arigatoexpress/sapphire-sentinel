@@ -6,6 +6,8 @@ __pycache__/
 coverage.xml
 .DS_Store
 .env
+.env.*
+!.env.example
 .~lock.*#
 *.pyc
 data/*
